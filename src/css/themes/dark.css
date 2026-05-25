@@ -1,0 +1,43 @@
+[data-theme="dark"] {
+  --theme-bg: #0a0a0a;
+  --theme-title-color: #f3f4f6;
+  --theme-text-color: #f3f4f6;
+  --theme-sub-color: #9ca3af;
+  --theme-frame-bg: color-mix(in srgb, #0f172a 58%, transparent);
+  --theme-frame-border: #334155;
+  --theme-title-font: "Inter", "Segoe UI", sans-serif;
+  --theme-body-font: "Merriweather", "Times New Roman", serif;
+  --theme-body-letter-spacing: 0;
+  --theme-spacer-border: transparent;
+  --theme-spacer-bg: transparent;
+}
+
+[data-theme="dark"] .hero-theme {
+  --theme-bg: #0a0a0a;
+  --theme-title-color: #f3f4f6;
+  --theme-text-color: #f3f4f6;
+  --theme-sub-color: #9ca3af;
+  --theme-frame-bg: color-mix(in srgb, #0f172a 58%, transparent);
+  --theme-frame-border: #334155;
+  --theme-title-font: "Inter", "Segoe UI", sans-serif;
+  --theme-body-font: "Merriweather", "Times New Roman", serif;
+  --theme-body-letter-spacing: 0;
+  --theme-spacer-border: transparent;
+  --theme-spacer-bg: transparent;
+}
+
+[data-theme="dark"] .service-theme {
+  --theme-bg: #1e1b4b;
+  --theme-text-color: #e0e7ff;
+  --theme-sub-color: #a5b4fc;
+  --theme-panel-bg: color-mix(in srgb, #312e81 42%, transparent);
+  --theme-panel-border: #4338ca;
+}
+
+[data-theme="dark"] .work-theme {
+  --theme-text-color: #d1fae5;
+  --theme-sub-color: #6ee7b7;
+  --theme-card-bg: color-mix(in srgb, #064e3b 46%, transparent);
+  --theme-card-border: #065f46;
+  --theme-card-text: #a7f3d0;
+}

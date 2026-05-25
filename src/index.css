@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@custom-variant wireframe (&:where([data-theme="wireframe"] *));
+@custom-variant dark (&:where([data-theme="dark"] *));
+@custom-variant synthwave (&:where([data-theme="synthwave"] *));
+@custom-variant brutalist (&:where([data-theme="brutalist"] *));
+
+/* ── Base resets ── */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+.crossed {
+  background:
+    linear-gradient(to top left,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0) calc(50% - 0.8px),
+      rgba(0, 0, 0, 1) 50%,
+      rgba(0, 0, 0, 0) calc(50% + 0.8px),
+      rgba(0, 0, 0, 0) 100%),
+    linear-gradient(to top right,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0) calc(50% - 0.8px),
+      rgba(0, 0, 0, 1) 50%,
+      rgba(0, 0, 0, 0) calc(50% + 0.8px),
+      rgba(0, 0, 0, 0) 100%);
+}
+
+    @import "./css/themes/common.css";
+    @import "./css/themes/wireframe.css";
+    @import "./css/themes/dark.css";
+    @import "./css/themes/synthwave.css";
+    @import "./css/themes/brutalist.css";
