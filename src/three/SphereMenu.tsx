@@ -87,7 +87,7 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
   const { interaction, focusedItemId, setInteraction, setActiveItemId, setFocusedItemId } = useSectionInteraction("work");
 
   const [mycam, setMycam] = useState<THREE.PerspectiveCamera | null>(null);
-  const [controls, setControls] = useState<TrackballControlsProps | null>(null);
+  const [controls, setControls] = useState<any | null>(null);
   const [icosahedron, setIcosahedron] = useState<THREE.Mesh | null>(null);
   const [group, setGroup] = useState<THREE.Group | null>(null);
   const [untouched, setUntouched] = useState(true);
