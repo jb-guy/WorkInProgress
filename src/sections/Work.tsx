@@ -13,8 +13,8 @@ const getProjectItemId = (projectName: string) => `work.${projectName.toLowerCas
 const items = [
   {
     id:"0",
-    image: '/src/assets/zentlogo.png',
-    background:'/src/assets/zentbg.png',
+    image: '/zentlogo.png',
+    background:'/zentbg.png',
     link: 'https://zentrycopy.pages.dev/',
     title: 'Zentry Copy',
     subtitle: 'Premium Landing Page',
@@ -23,8 +23,8 @@ const items = [
   },
   {
     id:"1",
-    image: '/src/assets/liryclogo.png',
-    background: '/src/assets/simnav.png',
+    image: '/liryclogo.png',
+    background: '/simnav.png',
     link: 'https://eplab.ihu-liryc.fr/',
     title: 'EPLab',
     subtitle: 'Electrophysiology Visualization',
@@ -33,8 +33,8 @@ const items = [
   },
   {
     id:"2",
-    image: '/src/assets/nessa-city.jpg',
-    background: '/src/assets/artist.png',
+    image: '/nessa-city.jpg',
+    background: '/artist.png',
     link: 'https://nathalieguy.fr/',
     title: 'Nathalie Guy',
     subtitle: 'Artistic Portfolio',
@@ -43,8 +43,8 @@ const items = [
   },
   {
     id:"3",
-    image: '/src/assets/bdmmini.png',
-    background: '/src/assets/boutdumonde.png',
+    image: '/bdmmini.png',
+    background: '/boutdumonde.png',
     link: 'https://apps.hyblab.fr/story2020/bouts-du-monde/',
     title: 'Bouts du Monde',
     subtitle: 'Interactive Storytelling',

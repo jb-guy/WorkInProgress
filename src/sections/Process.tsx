@@ -1,6 +1,7 @@
 import { use, useState, useRef } from "react";
 import { useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
+import { useSectionInteraction } from "../context/SectionInteractionContext";
 
 const items = [
   {
@@ -55,7 +56,8 @@ const ProcessOuterContent = ({ theme }: { theme: Theme }) => (
 
 const ProcessInnerContent = ({ theme }: { theme: Theme }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [step, setStep] = useState(0);
+  const { activeItemId, setActiveItemId } = useSectionInteraction("process");
+  const step = activeItemId ? items.findIndex(item => item.id === activeItemId) : 0;
 
   return (
   <div ref={sectionRef} className="process-theme relative flex h-full w-full flex-col py-30">
@@ -67,17 +69,17 @@ const ProcessInnerContent = ({ theme }: { theme: Theme }) => {
       Development Process
     </h2>
     <div className="pt-10 w-8/10 self-center flex flex-row justify-around items-center">
-      <button className="text-sub p-2" onClick={() => setStep(0)}> 01 </button>
+      <button className="text-sub p-2" onClick={() => setActiveItemId("1")}> 01 </button>
       <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setStep(1)}> 02 </button>
+      <button className="text-sub p-2" onClick={() => setActiveItemId("2")}> 02 </button>
       <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setStep(2)}> 03 </button>
+      <button className="text-sub p-2" onClick={() => setActiveItemId("3")}> 03 </button>
       <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setStep(3)}> 04 </button>
+      <button className="text-sub p-2" onClick={() => setActiveItemId("4")}> 04 </button>
       <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setStep(4)}> 05 </button>
+      <button className="text-sub p-2" onClick={() => setActiveItemId("5")}> 05 </button>
       <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setStep(5)}> 06 </button>
+      <button className="text-sub p-2" onClick={() => setActiveItemId("6")}> 06 </button>
     </div>
     <div className="w-full h-0 theme-border"/>
     <div className="grow w-full flex flex-row">
