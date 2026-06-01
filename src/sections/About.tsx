@@ -75,8 +75,8 @@ const AboutInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) 
       01 — About
     </p>
     <div className="w-full h-0 border"/>
-    <div className="grow w-full flex flex-row">
-      <div className="min-w-[15vw] w-[20vw] h-full theme-spacer" />
+    <div className="grow w-full flex flex-col lg:flex-row">
+      <div className="min-w-[5vw] w-[20vw] h-full theme-spacer" />
       <div className="grow theme-card flex flex-col items-center justify-center text-center px-4">
         <h2 className="text-4xl font-bold leading-none tracking-tight lg:text-7xl">
           My philosophy
@@ -92,7 +92,7 @@ const AboutInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) 
           interface design, motion and realtime rendering.
         </p>
       </div>
-      <div className="min-w-[15vw] w-[20vw] h-full theme-spacer" />
+      <div className="min-w-[5vw] w-[20vw] h-full theme-spacer" />
     </div>
     <div className="w-full h-0 border"/>
   </div>

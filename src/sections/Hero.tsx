@@ -10,7 +10,7 @@ const HeroOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) =
   const containerRef = useRef<HTMLDivElement>(null);
   const inView = useInView(containerRef);
   return (
-  <div className="hero-theme theme-bg relative h-screen w-full overflow-hidden" ref={containerRef}>
+  <div className="hero-theme theme-bg relative h-svh w-full overflow-hidden" ref={containerRef}>
     <div
       className="h-full w-full"
     >
@@ -44,7 +44,7 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
       
 
   return (
-  <div className="hero-theme relative h-screen w-full flex flex-col justify-end pb-2 lg:pb-10">
+  <div className="hero-theme relative h-svh w-full flex flex-col justify-end pb-2 lg:pb-10">
     <p className="mb-2 ml-4 text-xs uppercase tracking-widest theme-sub">
       00 — Hero
     </p>
