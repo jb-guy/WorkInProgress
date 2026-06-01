@@ -38,7 +38,6 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
       },
       onComplete() {
         setThemeLeft("holographic");
-        setTransition(0);
       }
     });
   }, []);

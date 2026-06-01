@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 import { useSplitTransition, useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
 
@@ -10,7 +11,11 @@ const ContactOuterContent = ({ theme }: { theme: Theme }) => (
 const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
-  const pendingTransitionRef = useRef<number | null>(null);
+  const pendingSceneRef = useRef<{
+    themeRight?: Theme;
+    splitMode?: ReturnType<typeof useSplitTransition>["splitMode"];
+    transition?: number;
+  } | null>(null);
   const lastTransitionRef = useRef<number>(-1);
   const { setThemeRight } = useTheme();
   const { setTransition, setSplitMode } = useSplitTransition();
@@ -20,20 +25,47 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
     offset: ["30% center", "40% center"],
   });
 
-  const queueTransition = useCallback((value: number) => {
-    const clamped = Math.max(0, Math.min(value, 1));
-    pendingTransitionRef.current = clamped;
+  const queueSceneUpdate = useCallback((update: {
+    themeRight?: Theme;
+    splitMode?: ReturnType<typeof useSplitTransition>["splitMode"];
+    transition?: number;
+  }) => {
+    const nextTransition = update.transition === undefined
+      ? pendingSceneRef.current?.transition
+      : Math.max(0, Math.min(update.transition, 1));
+
+    pendingSceneRef.current = {
+      ...pendingSceneRef.current,
+      ...update,
+      transition: nextTransition,
+    };
+
     if (rafRef.current !== null) return;
 
     rafRef.current = window.requestAnimationFrame(() => {
       rafRef.current = null;
-      const next = pendingTransitionRef.current;
-      if (next === null) return;
-      if (Math.abs(next - lastTransitionRef.current) < 0.002) return;
-      lastTransitionRef.current = next;
-      setTransition(next);
+      const next = pendingSceneRef.current;
+      pendingSceneRef.current = null;
+      if (!next) return;
+
+      const nextTransitionValue = next.transition;
+      const transitionChanged = nextTransitionValue !== undefined
+        && Math.abs(nextTransitionValue - lastTransitionRef.current) >= 0.002;
+
+      flushSync(() => {
+        if (next.themeRight) {
+          setThemeRight(next.themeRight);
+        }
+        if (next.splitMode) {
+          setSplitMode(next.splitMode);
+        }
+        if (transitionChanged && nextTransitionValue !== undefined) {
+          lastTransitionRef.current = nextTransitionValue;
+          setTransition(nextTransitionValue);
+        }
+      });
     });
-  }, [setTransition]);
+  }, [setSplitMode, setThemeRight, setTransition]);
 
   useEffect(() => {
     return () => {
@@ -45,14 +77,16 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
   
   useMotionValueEvent(scrollYProgress, "animationStart", () => {
     if (!right) return;
-    queueTransition(1);
+    queueSceneUpdate({ transition: 1 });
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!right) return;
-    setThemeRight("cybernoir");
-    setSplitMode("horizontal");
-    queueTransition(1 - latest);
+    queueSceneUpdate({
+      themeRight: "cybernoir",
+      splitMode: "horizontal",
+      transition: 1 - latest,
+    });
   });
 
   return (

@@ -30,7 +30,7 @@ const getTransitionStyle = (
     case "vertical":
       return `clip-path: polygon(${transition * 100}% 0,100% 0, 100% 100%, ${transition * 100}% 100%)`;
     case "horizontal":
-      return `clip-path: polygon(0% ${transition * 100}%, 100% ${transition * 100}%,100% 100%, 0% 100%)`;
+      return `clip-path: polygon(0% ${(1-transition) * 100}%, 100% ${(1-transition) * 100}%,100% 100%, 0% 100%)`;
     case "angled": 
       const overshoot = Math.abs(window.innerHeight * Math.tan((splitAngleDeg * Math.PI / 180)));
       const offset = -(window.innerWidth + overshoot) * transition;

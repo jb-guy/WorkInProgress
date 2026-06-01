@@ -2,7 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 export const THEMES = ["wireframe", "dark", "cybernoir", "holographic", "retro80"] as const;
 export type Theme = (typeof THEMES)[number];
-export const isDarkTheme = (theme: Theme) => theme === "dark" || theme === "cybernoir" || theme === "retro80" || theme === "holographic";
+export const isDarkTheme = (theme: Theme) => theme === "dark" || theme === "cybernoir" || theme === "holographic";
 export const SPLIT_MODES = ["vertical", "horizontal", "angled", "overlaped", "clip", "circle", "square"] as const;
 export type SplitMode = (typeof SPLIT_MODES)[number];
 
