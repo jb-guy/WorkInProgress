@@ -150,7 +150,6 @@ const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play:
     dpr={[1, 1.5]}
     gl={{ antialias: false, alpha: true }}
   >
-    <OrbitControls enableZoom={false} enablePan={false}/>
     {play && <SceneByTheme theme={theme} resolution={resolution} mousePos={mousePos} />}
   </Canvas>
 )};

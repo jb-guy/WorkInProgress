@@ -36,22 +36,22 @@
   content: "";
   position: absolute;
   top: 0;
-  left: 2rem;
-  width: 1rem;
+  left: 2vw;
+  width: 2vw;
   height: 100%;
   background: var(--darker-color);
-  box-shadow: -1rem 0 0 0 var(--muted-color), -2rem 0 0 0 var(--primary-color), -3rem 0 0 0 var(--secondary-color), -4rem 0 0 0 var(--tertiary-color);
+  box-shadow: inset 1vw 0 0 0 var(--muted-color), -1vw 0 0 0 var(--primary-color), -2vw 0 0 0 var(--secondary-color), -3vw 0 0 0 var(--tertiary-color);
 }
 
 [data-theme="retro80"] .theme-card::after{
   content: "";
   position: absolute;
   top: 0;
-  right: 2rem;
-  width: 1rem;
+  right: 2vw;
+  width: 2vw;
   height: 100%;
   background: var(--darker-color);
-  box-shadow: 1rem 0 0 0 var(--muted-color), 2rem 0 0 0 var(--primary-color), 3rem 0 0 0 var(--secondary-color), 4rem 0 0 0 var(--tertiary-color);
+  box-shadow: inset -1vw 0 0 0 var(--muted-color), 1vw 0 0 0 var(--primary-color), 2vw 0 0 0 var(--secondary-color), 3vw 0 0 0 var(--tertiary-color);
 }
 
 [data-theme="retro80"] button{
