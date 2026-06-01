@@ -1,5 +1,5 @@
-import { use, useEffect, useRef } from "react";
-import { useTheme, type Theme } from "../context/ThemeContext";
+import { useCallback, useEffect, useRef } from "react";
+import { useSplitTransition, useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
 
 const toSvgDataUri = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -47,25 +47,50 @@ const AboutOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) 
 
 const AboutInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const { setThemeRight, setTransition, setSplitMode } = useTheme();
+  const rafRef = useRef<number | null>(null);
+  const pendingTransitionRef = useRef<number | null>(null);
+  const lastTransitionRef = useRef<number>(-1);
+  const { setThemeRight } = useTheme();
+  const { setTransition, setSplitMode } = useSplitTransition();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["60% end", "70% end"],
+  });
 
-  if(right) {
-    const { scrollYProgress } = useScroll({
-      target: sectionRef,
-      offset: ["60% end", "70% end"],
+  const queueTransition = useCallback((value: number) => {
+    const clamped = Math.max(0, Math.min(value, 1));
+    pendingTransitionRef.current = clamped;
+    if (rafRef.current !== null) return;
+
+    rafRef.current = window.requestAnimationFrame(() => {
+      rafRef.current = null;
+      const next = pendingTransitionRef.current;
+      if (next === null) return;
+      if (Math.abs(next - lastTransitionRef.current) < 0.002) return;
+      lastTransitionRef.current = next;
+      setTransition(next);
     });
-    
-    useMotionValueEvent(scrollYProgress, "animationStart", () => {
-      //Not working
-      console.log("Service section scroll animation started");
-      setTransition(1);
-    });
-    useMotionValueEvent(scrollYProgress, "change", (latest) => {
-      setThemeRight("retro80");
-      setSplitMode("horizontal");
-      setTransition(1 - latest);
-    });
-  }
+  }, [setTransition]);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
+
+  useMotionValueEvent(scrollYProgress, "animationStart", () => {
+    if (!right) return;
+    queueTransition(1);
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (!right) return;
+    setThemeRight("retro80");
+    setSplitMode("horizontal");
+    queueTransition(1 - latest);
+  });
 
   return (
   <div ref={sectionRef} className="about-theme relative flex h-screen w-full flex-col py-30">

@@ -1,6 +1,6 @@
 import { animate, useInView } from "motion/react";
 import type { Theme } from "../context/ThemeContext";
-import { useTheme } from "../context/ThemeContext";
+import { useSplitTransition, useTheme } from "../context/ThemeContext";
 import HeroThemeScene from "../three/HeroThemeScene";
 import { useEffect, useRef } from "react";
 
@@ -19,7 +19,8 @@ const HeroOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) =
 )};
 
 const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) => {
-  const { setThemeRight, setThemeLeft, setTransition, setSplitMode } = useTheme();
+  const { setThemeRight, setThemeLeft } = useTheme();
+  const { setTransition, setSplitMode } = useSplitTransition();
 
   const handleCta = () => {
     

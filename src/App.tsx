@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { type SplitMode, ThemeProvider, isDarkTheme, useTheme, type Theme } from "./context/ThemeContext";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { type SplitMode, ThemeProvider, isDarkTheme, useTheme, useSplitTransition, type Theme } from "./context/ThemeContext";
 import { NavControlsBar, NavStatusBadge, NavWindow, type SectionId } from "./sections/Nav";
 import Hero from "./sections/Hero";
 import About from "./sections/About";
@@ -60,7 +60,10 @@ const applyClipPath = (
   opacity?: number,
 ) => {
   if (!element) return;
-  element.style = getTransitionStyle(negative, splitMode, splitAngleDeg, transition, opacity);
+  const nextStyle = getTransitionStyle(negative, splitMode, splitAngleDeg, transition, opacity);
+  if (element.dataset.clipCache === nextStyle) return;
+  element.dataset.clipCache = nextStyle;
+  element.style = nextStyle;
 }
 
 // ─── inner app, needs ThemeContext ────────────────────────────────────────────
@@ -73,15 +76,17 @@ function AppInner() {
     typeof window !== "undefined" ? window.innerHeight : 800
   );
   const {
+    themeLeft,
+    themeRight,
+    devMode,
+  } = useTheme();
+  const {
     setTransition,
     transition,
     splitMode,
     splitAngleDeg,
     themeRightOpacity,
-    themeLeft,
-    themeRight,
-    devMode,
-  } = useTheme();
+  } = useSplitTransition();
 
   const appRootRef   = useRef<HTMLDivElement>(null);
 
@@ -201,6 +206,38 @@ function AppInner() {
       ? themeLeft
       : themeRight;
 
+  const outerLeftSections = useMemo(() => {
+    return SECTIONS.map((section) => (
+      <div key={`outer-left-${section.id}`} className="w-full">
+        <section.Outer theme={themeLeft} />
+      </div>
+    ));
+  }, [themeLeft]);
+
+  const innerLeftSections = useMemo(() => {
+    return SECTIONS.map((section) => (
+      <div key={`inner-left-${section.id}`} className="w-full">
+        <section.Inner theme={themeLeft} />
+      </div>
+    ));
+  }, [themeLeft]);
+
+  const outerRightSections = useMemo(() => {
+    return SECTIONS.map((section) => (
+      <div key={`outer-right-${section.id}`} className="w-full pointer-events-auto">
+        <section.Outer theme={themeRight} right />
+      </div>
+    ));
+  }, [themeRight]);
+
+  const innerRightSections = useMemo(() => {
+    return SECTIONS.map((section) => (
+      <div key={`inner-right-${section.id}`} className="w-full">
+        <section.Inner theme={themeRight} right />
+      </div>
+    ));
+  }, [themeRight]);
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div
@@ -224,11 +261,7 @@ function AppInner() {
             ref={outerLeftStackRef}
             className="w-full will-change-scroll"
           >
-            {SECTIONS.map((section) => (
-              <div key={`outer-left-${section.id}`} className="w-full">
-                <section.Outer theme={themeLeft} />
-              </div>
-            ))}
+            {outerLeftSections}
           </div>
         </div>
       </div>
@@ -240,11 +273,7 @@ function AppInner() {
               ref={innerLeftStackRef}
               className="w-full will-change-scroll"
             >
-              {SECTIONS.map((section) => (
-                <div key={`inner-left-${section.id}`} className="w-full">
-                  <section.Inner theme={themeLeft} />
-                </div>
-              ))}
+              {innerLeftSections}
             </div>
           </NavWindow>
         </div>
@@ -256,11 +285,7 @@ function AppInner() {
             ref={outerRightStackRef}
             className="w-full will-change-scroll"
           >
-            {SECTIONS.map((section) => (
-              <div key={`outer-right-${section.id}`} className="w-full pointer-events-auto">
-                <section.Outer theme={themeRight} right />
-              </div>
-            ))}
+            {outerRightSections}
           </div>
         </div>
       </div>
@@ -272,11 +297,7 @@ function AppInner() {
               ref={innerRightStackRef}
               className="w-full will-change-scroll"
             >
-              {SECTIONS.map((section) => (
-                <div key={`inner-right-${section.id}`} className="w-full">
-                  <section.Inner theme={themeRight} right />
-                </div>
-              ))}
+              {innerRightSections}
             </div>
           </NavWindow>
         </div>
@@ -312,7 +333,7 @@ function SplitHandle({
   lineRef: React.RefObject<HTMLDivElement | null>;
   dominantTheme: Theme;
 }) {
-  const { transition, splitMode, splitAngleDeg } = useTheme();
+  const { transition, splitMode, splitAngleDeg } = useSplitTransition();
   const isDark = isDarkTheme(dominantTheme);
   const effectiveSplitX = Math.max(
     20,

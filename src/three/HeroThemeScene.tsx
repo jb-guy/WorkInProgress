@@ -8,14 +8,19 @@ import HolographicBackground from "./HolographicBackground";
 
 const SceneWireframe = () => {
   const cubeRef = useRef<THREE.Group>(null);
-  const [coords, setCords] = useState("");
+  const coordsRef = useRef<HTMLDivElement>(null);
+  const frameCounterRef = useRef(0);
 
 
   useFrame((_, delta) => {
     if (!cubeRef.current) return;
     cubeRef.current.rotation.y += delta * 0.25;
     cubeRef.current.rotation.x = Math.sin(performance.now() * 0.00035) * 0.25;
-    setCords(`x: ${cubeRef.current.rotation.x.toFixed(2)} y: ${cubeRef.current.rotation.y.toFixed(2)}`);
+
+    frameCounterRef.current += 1;
+    if (frameCounterRef.current % 6 === 0 && coordsRef.current) {
+      coordsRef.current.textContent = `x: ${cubeRef.current.rotation.x.toFixed(2)} y: ${cubeRef.current.rotation.y.toFixed(2)}`;
+    }
   });
 
   return (
@@ -25,9 +30,7 @@ const SceneWireframe = () => {
         <meshBasicMaterial color="#000000" wireframe/>
       </mesh>
       <Html position={[0.6, 0.6, 0.6]} center>
-        <div className="flex opacity-50 w-30 text-sub text-xs font-mono">
-          {coords}
-        </div>
+        <div ref={coordsRef} className="flex opacity-50 w-30 text-sub text-xs font-mono" />
       </Html>
     </group>
   );
@@ -102,8 +105,18 @@ const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play:
     />
   );
 
-  const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, window.innerWidth < 768 ? -2 : -0.5, window.innerWidth < 768 ? 10.4 : 5.2);
+  const camera = useMemo(() => {
+    const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
+    const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 800;
+    const nextCamera = new THREE.PerspectiveCamera(48, viewportWidth / viewportHeight, 0.1, 100);
+    nextCamera.position.set(0, viewportWidth < 768 ? -2 : -0.5, viewportWidth < 768 ? 10.4 : 5.2);
+    return nextCamera;
+  }, []);
+
+  const maxDpr = useMemo(() => {
+    if (typeof window === "undefined") return 1.25;
+    return window.innerWidth < 768 ? 1.15 : 1.25;
+  }, []);
 
 
   const canvaRef = useRef<HTMLCanvasElement>(null);
@@ -147,7 +160,7 @@ const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play:
   <Canvas
     ref={canvaRef}
     camera={camera}
-    dpr={[1, 1.5]}
+    dpr={[1, maxDpr]}
     gl={{ antialias: false, alpha: true }}
   >
     {play && <SceneByTheme theme={theme} resolution={resolution} mousePos={mousePos} />}

@@ -1,7 +1,7 @@
-import { useRef, useEffect, useMemo, use, Suspense } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAnimate, useInView, useSpring } from "motion/react";
+import { useAnimate, useInView } from "motion/react";
 
 const vertex = `
 void main(){gl_Position=vec4(position,1.0);}
@@ -9,7 +9,7 @@ void main(){gl_Position=vec4(position,1.0);}
 
 const fragment = `
 #ifdef GL_ES
-precision lowp float;
+precision mediump float;
 #endif
 uniform vec2 uResolution;
 uniform float uTime;
@@ -117,7 +117,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	value = simplex3d_fractal(p3*4.0+4.0);
 	value = value+expansion;
   value *= 2.0;
-  value = clamp(0.0, 1.0, value);
+	value = clamp(value, 0.0, 1.0);
 	
 	fragColor = vec4(texture(uTexture, fragCoord / uResolution.xy).rgb * vec3(value*(uProgress-0.2)/0.8),value);
 	return;
@@ -148,9 +148,10 @@ function ShaderPlane({
   const mesh = useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null!);
 	const [scope, animate] = useAnimate();
 
-	if (mesh.current) {
+	useEffect(() => {
+		if (!mesh.current) return;
 		animate(mesh.current.material.uniforms.uProgress.value, progress, {
-			duration: progress>0.3 ? 1.2 : 0.5,
+			duration: progress > 0.3 ? 1.2 : 0.5,
 			ease: "backInOut",
 			onUpdate: (latest) => {
 				if (mesh.current) {
@@ -158,12 +159,13 @@ function ShaderPlane({
 				}
 			},
 		});
-	}
+	}, [progress]);
 
 	useEffect(() => {
-		console.log("Loading texture:", image);
+		if (!mesh.current) return;
 		if (image) {
 			textureLoader.loadAsync(image).then((texture) => {
+				if (!mesh.current) return;
 				mesh.current.material.uniforms.uTexture.value = texture;
 			});
 		}
@@ -173,6 +175,7 @@ function ShaderPlane({
 	}, [image]);
 
 	useEffect(() => {
+		if (!mesh.current) return;
 		mesh.current.material.uniforms.uResolution.value = size;
 	}, [size]);
 
@@ -218,27 +221,32 @@ const Scene = ({
 	const canva = useRef<HTMLCanvasElement>(null!);
 	const container = useRef<HTMLDivElement>(null!);
 	const resolution = useMemo(() => new THREE.Vector2(100, 100), []);
+	const maxDpr = useMemo(() => {
+		if (typeof window === "undefined") return 1.35;
+		return window.innerWidth < 768 ? 1.2 : 1.35;
+	}, []);
 	const inView = useInView(container);
+	const shouldRender = inView || progress > 0.001;
 	useEffect(() => {
 		const handleResize = () => {
 			if (container.current) {
 				const rect = container.current.getBoundingClientRect();
-				if(rect.width*2 == resolution.x && rect.height*2 == resolution.y) return;
-				resolution.set(rect.width*2, rect.height*2);
+				const nextWidth = Math.max(1, Math.round(rect.width * maxDpr));
+				const nextHeight = Math.max(1, Math.round(rect.height * maxDpr));
+				if(nextWidth === resolution.x && nextHeight === resolution.y) return;
+				resolution.set(nextWidth, nextHeight);
 			}
 		};
 		handleResize();
 		window.addEventListener("resize", handleResize);
 		return () => window.removeEventListener("resize", handleResize);
-	}, []);
+	}, [maxDpr]);
 
   return (
 		<div ref={container} className={`h-full w-full ${className}`}>
-			{inView && 
-			<Canvas ref={canva} className="w-full h-full">
-      	<ShaderPlane image={image} progress={progress} size={resolution} />
+			<Canvas ref={canva} className="w-full h-full" dpr={[1, maxDpr]} gl={{ antialias: false, alpha: true }}>
+				{shouldRender ? <ShaderPlane image={image} progress={progress} size={resolution} /> : null}
 			</Canvas>
-			}
 		</div>
   );
 };

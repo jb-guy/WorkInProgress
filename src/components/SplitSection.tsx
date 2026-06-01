@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from "react";
-import { useTheme, type Theme, type SplitMode } from "../context/ThemeContext";
+import { useSplitTransition, useTheme, type Theme, type SplitMode } from "../context/ThemeContext";
 
 interface Props {
   /** render prop — receives the current theme string so sections can style themselves */
@@ -20,10 +20,12 @@ const SplitSection = ({ children, className = "" }: Props) => {
   const {
     themeLeft,
     themeRight,
+  } = useTheme();
+  const {
     transition,
     splitMode,
     splitAngleDeg,
-  } = useTheme();
+  } = useSplitTransition();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const effectiveSplitX = Math.max(

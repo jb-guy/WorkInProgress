@@ -2,6 +2,7 @@ import {
   SPLIT_MODES,
   THEMES,
   isDarkTheme,
+  useSplitTransition,
   useTheme,
   type SplitMode,
   type Theme,
@@ -78,17 +79,19 @@ const getPalette = (theme: Theme) => {
 
 export const NavControlsBar = ({ dominantTheme }: NavChromeProps) => {
   const {
-    themeLeft,
-    themeRight,
     splitMode,
     splitAngleDeg,
     themeRightOpacity,
-    devMode,
-    setThemeLeft,
-    setThemeRight,
     setSplitMode,
     setSplitAngleDeg,
     setThemeRightOpacity,
+  } = useSplitTransition();
+  const {
+    themeLeft,
+    themeRight,
+    devMode,
+    setThemeLeft,
+    setThemeRight,
     setDevMode,
   } = useTheme();
   const { separatorClass, selectClass } = getPalette(dominantTheme);
@@ -167,7 +170,7 @@ export const NavWindow = ({ children, dominantTheme }: NavWindowProps) => {
   const { frameClass } = getPalette(dominantTheme);
 
   return (
-    <div className="h-screen w-full fixed p-2 lg:p-10 lg:pt-22 pointer-events-none">
+    <div className="h-screen w-full fixed p-2 lg:p-10 pt-14 lg:pt-22 pointer-events-none">
       <div className={`h-full w-full border border-t-0 rounded-b-xl lg:rounded-b-2xl overflow-hidden pointer-events-none ${frameClass} transition-colors`}>
         <div className="h-screen w-full overflow-hidden -mt-14 lg:-mt-22">{children}</div>
       </div>
