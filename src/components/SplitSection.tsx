@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from "react";
-import { useTheme, type Theme } from "../context/ThemeContext";
+import { useTheme, type Theme, type SplitMode } from "../context/ThemeContext";
 
 interface Props {
   /** render prop — receives the current theme string so sections can style themselves */
@@ -20,8 +20,7 @@ const SplitSection = ({ children, className = "" }: Props) => {
   const {
     themeLeft,
     themeRight,
-    splitX,
-    splitY,
+    transition,
     splitMode,
     splitAngleDeg,
   } = useTheme();
@@ -29,14 +28,14 @@ const SplitSection = ({ children, className = "" }: Props) => {
 
   const effectiveSplitX = Math.max(
     40,
-    Math.min(splitX, typeof window !== "undefined" ? window.innerWidth - 40 : 1160)
+    Math.min(transition, typeof window !== "undefined" ? window.innerWidth - 40 : 1160)
   );
   const effectiveSplitY = Math.max(
     40,
-    Math.min(splitY, typeof window !== "undefined" ? window.innerHeight - 40 : 760)
+    Math.min(transition, typeof window !== "undefined" ? window.innerHeight - 40 : 760)
   );
 
-  const getSplitNormal = (splitMode: "vertical" | "horizontal" | "angled" | "overlaped", splitAngleDeg: number) => {
+  const getSplitNormal = (splitMode: SplitMode, splitAngleDeg: number) => {
     if (splitMode === "horizontal") return { nx: 0, ny: 1 };
     if (splitMode === "vertical") return { nx: 1, ny: 0 };
 
