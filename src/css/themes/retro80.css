@@ -1,0 +1,75 @@
+[data-theme="retro80"] {
+
+  --dark: #010303;
+  --light: #F6E9D8;
+
+  --primary-color: #FFBE4A;
+  --secondary-color: #F88302;
+  --tertiary-color: #D62929;
+  --muted-color: #00AAA5;
+  --darker-color: #002B4B;
+
+  --theme-bg: var(--light);
+
+  --theme-title-color: #010303;
+  --theme-title-font: "Inter", "Segoe UI", sans-serif;
+
+  --theme-text-color: #010303;
+  --theme-text-font: "Inter", "Segoe UI", sans-serif;
+  --theme-sub-color: var(--tertiary-color);
+
+  --theme-card-bg: var(--dark);
+  --theme-card-border-radius: 0px;
+  --theme-card-padding: 2rem;
+  --theme-card-margin: 0rem;
+  --theme-card-text-color: var(--light);
+
+  --theme-button-bg: #ffffff50;
+  --theme-button-border-radius: 9px;
+  --theme-button-text: #111111;
+  --theme-button-font: "IBM Plex Mono", "SFMono-Regular", monospace;
+  --theme-button-transform: uppercase;
+  --theme-button-letter-spacing: 0.1em;
+}
+
+[data-theme="retro80"] .theme-card::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 2rem;
+  width: 1rem;
+  height: 100%;
+  background: var(--darker-color);
+  box-shadow: -1rem 0 0 0 var(--muted-color), -2rem 0 0 0 var(--primary-color), -3rem 0 0 0 var(--secondary-color), -4rem 0 0 0 var(--tertiary-color);
+}
+
+[data-theme="retro80"] .theme-card::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 2rem;
+  width: 1rem;
+  height: 100%;
+  background: var(--darker-color);
+  box-shadow: 1rem 0 0 0 var(--muted-color), 2rem 0 0 0 var(--primary-color), 3rem 0 0 0 var(--secondary-color), 4rem 0 0 0 var(--tertiary-color);
+}
+
+[data-theme="retro80"] button{
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 20px 10px rgba(255, 255, 255, 1);
+}
+
+[data-theme="retro80"] button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, #ffffff00, #ffffffff, #ffffff00);
+}

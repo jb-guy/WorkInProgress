@@ -1,12 +1,36 @@
 [data-theme="wireframe"] {
+
+  --primary-color: #111111;
+  --secondary-color: #6b7280;
+
+
   --theme-bg: #ffffff;
-  --theme-title-color: #111827;
+
+  --theme-title-color: var(--primary-color);
+  --theme-title-font: "Inter", "Segoe UI", sans-serif;
+  --theme-title-transform: none;
+
+  --theme-sub-color: var(--secondary-color);
   --theme-sub-font: "IBM Plex Mono", "SFMono-Regular", monospace;
-  --theme-border-color: #111111;
-  --theme-spacer-border: #111111;
+
+  --theme-text-color: var(--primary-color);
+  --theme-text-font: "Inter", "Segoe UI", sans-serif;
+  
+  --theme-border-color: var(--primary-color);
+  --theme-spacer-border: var(--primary-color);
+
+  --theme-button-border: none;
+  --theme-button-border-radius: 0;
+  --theme-button-text: var(--primary-color);
+  --theme-button-font: "IBM Plex Mono", "SFMono-Regular", monospace;
+  --theme-button-padding: 0.5rem 0rem;
+  --theme-button-transform: uppercase;
+  --theme-button-letter-spacing: 0.1em;
+
   --theme-card-bg: #ffffff;
   --theme-card-border-color: #111111;
   --theme-card-border-width: 1px;
+
   --theme-spacer-bg:
     linear-gradient(to top left,
       rgba(0, 0, 0, 0) 0%,
@@ -22,37 +46,19 @@
       rgba(0, 0, 0, 0) 100%);
 }
 
-[data-theme="wireframe"] .hero-theme {
-  --theme-text-color: #111827;
-  --theme-sub-color: #4b5563;
-  --theme-frame-bg: color-mix(in srgb, white 72%, transparent);
-  --theme-frame-border: #cbd5e1;
-  --theme-title-font: "Inter", "Segoe UI", sans-serif;
-  --theme-title-transform: none;
-  --theme-body-font: "IBM Plex Mono", "SFMono-Regular", monospace;
-  --theme-body-transform: none;
-  --theme-body-letter-spacing: 0.02em;
+
+[data-theme="wireframe"] .theme-card {
+  outline: 1px solid var(--theme-card-border-color);
 }
 
-
-[data-theme="wireframe"] button {
-  border: none;
-  background: none;
-  color: inherit;
-  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
 [data-theme="wireframe"] button:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 [data-theme="wireframe"] button::before {
-  
   content: "[ ";
 }
 [data-theme="wireframe"] button::after {
-  
   content: " ]";
 }
 

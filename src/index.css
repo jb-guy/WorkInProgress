@@ -2,8 +2,9 @@
 
 @custom-variant wireframe (&:where([data-theme="wireframe"] *));
 @custom-variant dark (&:where([data-theme="dark"] *));
-@custom-variant synthwave (&:where([data-theme="synthwave"] *));
-@custom-variant brutalist (&:where([data-theme="brutalist"] *));
+@custom-variant cybernoir (&:where([data-theme="cybernoir"] *));
+@custom-variant holographic (&:where([data-theme="holographic"] *));
+@custom-variant retro80 (&:where([data-theme="retro80"] *));
 
 /* ── Base resets ── */
 * { box-sizing: border-box; }
@@ -28,5 +29,6 @@ html, body { margin: 0; padding: 0; }
     @import "./css/themes/common.css";
     @import "./css/themes/wireframe.css";
     @import "./css/themes/dark.css";
-    @import "./css/themes/synthwave.css";
-    @import "./css/themes/brutalist.css";
+    @import "./css/themes/cybernoir.css";
+    @import "./css/themes/holographic.css";
+    @import "./css/themes/retro80.css";

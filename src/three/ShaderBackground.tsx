@@ -1,8 +1,7 @@
 import { useRef, useEffect, useMemo, use, Suspense } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAnimate, useSpring } from "motion/react";
-import { s } from "motion/react-client";
+import { useAnimate, useInView, useSpring } from "motion/react";
 
 const vertex = `
 void main(){gl_Position=vec4(position,1.0);}
@@ -219,7 +218,7 @@ const Scene = ({
 	const canva = useRef<HTMLCanvasElement>(null!);
 	const container = useRef<HTMLDivElement>(null!);
 	const resolution = useMemo(() => new THREE.Vector2(100, 100), []);
-
+	const inView = useInView(container);
 	useEffect(() => {
 		const handleResize = () => {
 			if (container.current) {
@@ -235,9 +234,11 @@ const Scene = ({
 
   return (
 		<div ref={container} className={`h-full w-full ${className}`}>
+			{inView && 
 			<Canvas ref={canva} className="w-full h-full">
       	<ShaderPlane image={image} progress={progress} size={resolution} />
 			</Canvas>
+			}
 		</div>
   );
 };

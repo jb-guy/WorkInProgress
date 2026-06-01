@@ -1,38 +1,51 @@
 .theme-bg {
-  background: var(--theme-bg, transparent);
+  background: var(--theme-bg, #fff);
 }
 
 .theme-title {
   color: var(--theme-title-color, inherit);
   font-family: var(--theme-title-font, inherit);
   text-transform: var(--theme-title-transform, none);
+  pointer-events: auto;
 }
-
-
 
 .theme-text {
   color: var(--theme-text-color, inherit);
-  font-family: var(--theme-body-font, inherit);
+  font-family: var(--theme-text-font, inherit);
+  pointer-events: auto;
 }
 
 .theme-sub {
   color: var(--theme-sub-color, inherit);
   font-family: var(--theme-sub-font, inherit);
+  pointer-events: auto;
 }
 
 .theme-card {
+  position: relative;
   background: var(--theme-card-bg, transparent);
+  background-image: var(--theme-card-background-image, none);
+  background-origin: var(--theme-card-background-origin, none);
+  background-clip: var(--theme-card-background-clip, none);
+  color: var(--theme-card-text-color, inherit);
+  border: var(--theme-card-border, none);
   border-color: var(--theme-card-border-color, currentColor);
-  border-width: var(--theme-card-border-width, currentColor);
+  border-image: var(--theme-card-border-image, none);
+  border-width: var(--theme-card-border-width, 0px);
+  border-style: var(--theme-card-border-style, solid);
   border-radius: var(--theme-card-border-radius, 0);
-  padding: 4rem 2rem;
-  color: var(--theme-card-text, inherit);
+  padding: var(--theme-card-padding, 2rem);
+  margin: var(--theme-card-margin, 0rem);
+  pointer-events: auto;
 }
 
 button {
   cursor: pointer;
+  pointer-events: auto;
   border: var(--theme-button-border, none);
-  background: none;
+  background: var(--theme-button-bg, transparent);
+  border-radius: var(--theme-button-border-radius, 0);
+  padding: var(--theme-button-padding, 0.5rem 1rem);
   color: var(--theme-button-text, inherit);
   font-family: var(--theme-button-font, inherit);
   text-transform: var(--theme-button-transform, none);

@@ -181,12 +181,14 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
     });
   }
 
+  /*
   useFrame((_, delta) => {
     if(group && untouched){
-      //group.rotation.y += delta * 0.1;
-      //group.rotation.x += delta * 0.05;
+      group.rotation.y += delta * 0.1;
+      group.rotation.x += delta * 0.05;
     }
   });
+  */
 
 
   return (
@@ -207,7 +209,7 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
       <group ref={setGroup}>
         <mesh ref={setIcosahedron}>
           <icosahedronGeometry args={[15, 1]} />
-          <meshStandardMaterial color="#888888" transparent opacity={0.0} />
+          <meshStandardMaterial color="#888888" transparent opacity={0.001} />
         </mesh>
         <ItemsIcosahedron items={items} />
       </group>
@@ -216,8 +218,9 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
 };
 
 export default ({ size, items, className }: { size: number, items: Item[], className?: string }) => {
+  const { hoveredItemId, setHoveredItemId } = useSectionInteraction("work");
   return (
-    <div className={`h-full w-full ${className}`} onMouseDown={(e)=>{e.preventDefault()}}>
+    <div className={`h-full w-full cursor-grab ${className}`} onMouseDown={(e)=>{e.preventDefault()}}>
       <Canvas
         dpr={[1, 1]}
         gl={{ antialias: false, alpha: true }}

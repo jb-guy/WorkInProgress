@@ -1,23 +1,35 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Theme } from "../context/ThemeContext";
+import { Html, OrbitControls, Wireframe } from "@react-three/drei";
+import Hyperspeed from "./Hyperspeed";
+import HolographicBackground from "./HolographicBackground";
 
 const SceneWireframe = () => {
   const cubeRef = useRef<THREE.Group>(null);
+  const [coords, setCords] = useState("");
+
+
   useFrame((_, delta) => {
     if (!cubeRef.current) return;
     cubeRef.current.rotation.y += delta * 0.25;
     cubeRef.current.rotation.x = Math.sin(performance.now() * 0.00035) * 0.25;
+    setCords(`x: ${cubeRef.current.rotation.x.toFixed(2)} y: ${cubeRef.current.rotation.y.toFixed(2)}`);
   });
 
   return (
-    <>
-        <mesh ref={cubeRef}>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#94a3b8"/>
-        </mesh>
-    </>
+    <group ref={cubeRef}>
+      <mesh>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial color="#000000" wireframe/>
+      </mesh>
+      <Html position={[0.6, 0.6, 0.6]} center>
+        <div className="flex opacity-50 w-30 text-sub text-xs font-mono">
+          {coords}
+        </div>
+      </Html>
+    </group>
   );
 };
 
@@ -43,80 +55,104 @@ const SceneDark = () => {
   );
 };
 
-const SceneSynthwave = () => {
-  const ringRef = useRef<THREE.Mesh>(null);
-  useFrame((_, delta) => {
-    if (!ringRef.current) return;
-    ringRef.current.rotation.z += delta * 0.45;
-    ringRef.current.rotation.y += delta * 0.22;
-  });
-
-  return (
-    <>
-      <mesh ref={ringRef} position={[0, 0.15, 0]}>
-        <torusKnotGeometry args={[0.85, 0.24, 160, 20]} />
-        <meshStandardMaterial color="#f472b6" roughness={0.3} metalness={0.72} />
-      </mesh>
-      <mesh position={[0, -1.55, -0.9]} rotation={[-0.6, 0, 0]}>
-        <planeGeometry args={[7, 3.3]} />
-        <meshStandardMaterial color="#312e81" roughness={1} metalness={0} />
-      </mesh>
-    </>
-  );
-};
-
-const SceneBrutalist = () => {
-  const blocks = useMemo(
-    () => [
-      { position: [-1.6, 0.9, 0], scale: [0.8, 1.2, 0.8] as [number, number, number] },
-      { position: [0, 0.1, 0], scale: [1.1, 1.1, 1.1] as [number, number, number] },
-      { position: [1.7, -0.75, 0], scale: [0.9, 1.4, 0.9] as [number, number, number] },
-    ],
-    []
-  );
-
-  const groupRef = useRef<THREE.Group>(null);
-  useFrame((_, delta) => {
-    if (!groupRef.current) return;
-    groupRef.current.rotation.y += delta * 0.18;
-  });
-
-  return (
-    <>
-    <group ref={groupRef}>
-      {blocks.map((block, index) => (
-        <mesh key={index} position={block.position as [number, number, number]} scale={block.scale}>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#999999" roughness={0.1} metalness={0.9} />
-        </mesh>
-      ))}
-      <directionalLight position={[2, 3, 2]} intensity={1.5} color="#ffffff" />
-    </group>
-    </>
-  );
-};
-
-const SceneByTheme = ({ theme }: { theme: Theme }) => {
+const SceneByTheme = ({ theme, resolution, mousePos }: { theme: Theme, resolution: { x: number, y: number }, mousePos: { x: number, y: number } }) => {
   if (theme === "dark") return <SceneDark />;
-  if (theme === "synthwave") return <SceneSynthwave />;
-  if (theme === "brutalist") return <SceneBrutalist />;
+  if (theme === "holographic") return <HolographicBackground resolution={resolution} mousePos={mousePos} />;
   return <SceneWireframe />;
 };
 
-const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, window.innerWidth < 768 ? -2 : 0, window.innerWidth < 768 ? 10.4 : 5.2);
+const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play: boolean, mouseReact?: boolean }) => {
+  if(theme === "cybernoir") return (
+    <Hyperspeed
+      effectOptions={{
+        "distortion":"turbulentDistortion",
+        "length":400,
+        "roadWidth":15,
+        "islandWidth":2,
+        "lanesPerRoad":5,
+        "fov":60,
+        "fovSpeedUp":150,
+        "speedUp":2,
+        "carLightsFade":0.4,
+        "totalSideLightSticks":50,
+        "lightPairsPerRoadWay":50,
+        "shoulderLinesWidthPercentage":0.05,
+        "brokenLinesWidthPercentage":0.1,
+        "brokenLinesLengthPercentage":0.5,
+        "lightStickWidth":[0.12,0.5],
+        "lightStickHeight":[1.3,1.7],
+        "movingAwaySpeed":[-80,60],
+        "movingCloserSpeed":[-120,-160],
+        "carLightsLength":[20,60],
+        "carLightsRadius":[0.05,0.14],
+        "carWidthPercentage":[0.3,0.5],
+        "carShiftX":[-0.2,0.2],
+        "carFloorSeparation":[0.05,1],
+        "colors":{
+          "roadColor":526344,
+          "islandColor":657930,
+          "background":0,
+          "shoulderLines":1250072,
+          "brokenLines":1250072,
+          "leftCars":[16715818,15415358,16715818],
+          "rightCars":[14342906,12499683,9410532],
+          "sticks":14342906
+        }
+      }}
+    />
+  );
 
-const HeroThemeScene = ({ theme }: { theme: Theme }) => (
+  const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, window.innerWidth < 768 ? -2 : -0.5, window.innerWidth < 768 ? 10.4 : 5.2);
+
+
+  const canvaRef = useRef<HTMLCanvasElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [resolution, setResolution] = useState({ x: 100, y: 100 });
+
+
+  useEffect(() => {
+    if (!canvaRef.current) return;
+    const canva = canvaRef.current;
+
+
+    function resize() {
+      const width = canva.clientWidth;
+      const height = canva.clientHeight;
+      setResolution({ x: width, y: height });
+    }
+    window.addEventListener('resize', resize, false);
+    resize();
+
+    function handleMouseMove(e: MouseEvent) {
+      const rect = canva.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = 1.0 - (e.clientY - rect.top) / rect.height;
+      setMousePos({ x, y });
+    }
+
+    if (mouseReact) {
+      canva.addEventListener('mousemove', handleMouseMove);
+    }
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      if (mouseReact) {
+        canva.removeEventListener('mousemove', handleMouseMove);
+      }
+    };
+  }, []);
+
+  return (
   <Canvas
+    ref={canvaRef}
     camera={camera}
     dpr={[1, 1.5]}
     gl={{ antialias: false, alpha: true }}
   >
-    <ambientLight intensity={0.72} />
-    <directionalLight position={[2, 3, 2]} intensity={1.2} />
-    <pointLight position={[-3, -2, 2]} intensity={0.7} color="#ffffff" />
-    <SceneByTheme theme={theme} />
+    <OrbitControls enableZoom={false} enablePan={false}/>
+    {play && <SceneByTheme theme={theme} resolution={resolution} mousePos={mousePos} />}
   </Canvas>
-);
+)};
 
 export default HeroThemeScene;

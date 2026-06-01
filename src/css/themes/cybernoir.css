@@ -1,0 +1,32 @@
+[data-theme="cybernoir"] {
+  --theme-title-color: #f3f4f6;
+  --theme-title-font: "Inter", "Segoe UI", sans-serif;
+
+
+  --theme-text-color: #f3f4f6;
+  --theme-sub-color: #d21717;
+
+  --theme-card-bg: color-mix(in srgb, #164e63 55%, transparent);
+  --theme-card-border-radius: 2rem;
+  --theme-card-padding: 1rem;
+  --theme-card-margin: 1rem;
+  --theme-card-text: #a5f3fc;
+  --theme-card-box-sizing: content-box;
+
+  --theme-button-bg: #140f1d80;
+  --theme-button-border: 1px solid #d21717;
+  --theme-button-border-radius: 9px;
+  --theme-button-text: #ffffff;
+  --theme-button-font: "IBM Plex Mono", "SFMono-Regular", monospace;
+  --theme-button-transform: uppercase;
+  --theme-button-letter-spacing: 0.1em;
+
+  --theme-bg: #140f1d;
+}
+
+[data-theme="cybernoir"] h1::after,
+[data-theme="cybernoir"] h2::after {
+  position: absolute;
+  color: #d21717;
+  content: "_";
+}

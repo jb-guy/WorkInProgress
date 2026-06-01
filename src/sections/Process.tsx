@@ -50,7 +50,7 @@ const items = [
 
 
 const ProcessOuterContent = ({ theme }: { theme: Theme }) => (
-  <div className="process-theme theme-bg relative h-full w-full overflow-hidden">
+  <div className="process-theme theme-bg relative h-screen w-full overflow-hidden">
   </div>
 );
 
@@ -60,30 +60,31 @@ const ProcessInnerContent = ({ theme }: { theme: Theme }) => {
   const step = activeItemId ? items.findIndex(item => item.id === activeItemId) : 0;
 
   return (
-  <div ref={sectionRef} className="process-theme relative flex h-full w-full flex-col py-30">
+  <div ref={sectionRef} className="process-theme relative flex h-screen w-full flex-col py-15 lg:py-30">
     <p className="theme-sub mb-2 ml-4 font-mono text-xs uppercase tracking-widest">
       03 — Process
     </p>
     <div className="w-full h-0 theme-border"/>
-    <h2 className="theme-text ml-4 sm:ml-8 pt-4 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-7xl">
+    <h2 className="theme-title ml-4 sm:ml-8 pt-4 mb-10 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-7xl">
       Development Process
     </h2>
-    <div className="pt-10 w-8/10 self-center flex flex-row justify-around items-center">
-      <button className="text-sub p-2" onClick={() => setActiveItemId("1")}> 01 </button>
-      <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setActiveItemId("2")}> 02 </button>
-      <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setActiveItemId("3")}> 03 </button>
-      <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setActiveItemId("4")}> 04 </button>
-      <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setActiveItemId("5")}> 05 </button>
-      <span className="text-xs opacity-0 wireframe:opacity-50">&#8594;</span>
-      <button className="text-sub p-2" onClick={() => setActiveItemId("6")}> 06 </button>
-    </div>
-    <div className="w-full h-0 theme-border"/>
-    <div className="grow w-full flex flex-row">
-      <div className="w-[35vw] flex flex-col justify-center text-left px-4">
+    
+    <div className="h-full w-full grid grid-cols-[auto_5rem] lg:grid-cols-[35%_65%] grid-rows-[auto_1fr] ">
+      <div className="lg:h-10 order-2 lg:order-0 lg:col-span-2 p-2 lg:px-24 text-xs lg:text-base flex flex-col lg:flex-row justify-around items-center">
+        <button className="text-sub" onClick={() => setActiveItemId("1")}> 01 </button>
+        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
+        <button className="text-sub" onClick={() => setActiveItemId("2")}> 02 </button>
+        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
+        <button className="text-sub" onClick={() => setActiveItemId("3")}> 03 </button>
+        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
+        <button className="text-sub" onClick={() => setActiveItemId("4")}> 04 </button>
+        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
+        <button className="text-sub" onClick={() => setActiveItemId("5")}> 05 </button>
+        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
+        <button className="text-sub" onClick={() => setActiveItemId("6")}> 06 </button>
+      </div>
+
+      <div className="h-full theme-card flex flex-col justify-center text-left">
         <h3 className="theme-title text-3xl font-bold leading-none tracking-tight lg:text-5xl">
           {items[step].title}
         </h3>
@@ -94,9 +95,8 @@ const ProcessInnerContent = ({ theme }: { theme: Theme }) => {
           {items[step].description}
         </p>
       </div>
-      <div className="grow h-full theme-spacer theme-card" />
+      <div className="h-full order-2 col-span-2 lg:col-span-1 theme-spacer theme-card" />
     </div>
-    <div className="w-full h-0 theme-border"/>
   </div>
 )};
 
