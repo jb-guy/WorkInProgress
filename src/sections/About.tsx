@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef } from "react";
-import { flushSync } from "react-dom";
-import { useSplitTransition, useTheme, type Theme } from "../context/ThemeContext";
+import { useEffect, useRef } from "react";
+import { useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
+import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 const toSvgDataUri = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 
@@ -48,69 +48,12 @@ const AboutOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) 
 
 const AboutInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const pendingSceneRef = useRef<{
-    themeRight?: Theme;
-    splitMode?: ReturnType<typeof useSplitTransition>["splitMode"];
-    transition?: number;
-  } | null>(null);
-  const lastTransitionRef = useRef<number>(-1);
   const { setThemeRight } = useTheme();
-  const { setTransition, setSplitMode } = useSplitTransition();
+  const queueSceneUpdate = useQueuedSceneUpdate();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["60% end", "70% end"],
   });
-
-  const queueSceneUpdate = useCallback((update: {
-    themeRight?: Theme;
-    splitMode?: ReturnType<typeof useSplitTransition>["splitMode"];
-    transition?: number;
-  }) => {
-    const nextTransition = update.transition === undefined
-      ? pendingSceneRef.current?.transition
-      : Math.max(0, Math.min(update.transition, 1));
-
-    pendingSceneRef.current = {
-      ...pendingSceneRef.current,
-      ...update,
-      transition: nextTransition,
-    };
-
-    if (rafRef.current !== null) return;
-
-    rafRef.current = window.requestAnimationFrame(() => {
-      rafRef.current = null;
-      const next = pendingSceneRef.current;
-      pendingSceneRef.current = null;
-      if (!next) return;
-
-      const nextTransitionValue = next.transition;
-      const transitionChanged = nextTransitionValue !== undefined
-        && Math.abs(nextTransitionValue - lastTransitionRef.current) >= 0.002;
-
-      flushSync(() => {
-        if (next.themeRight) {
-          setThemeRight(next.themeRight);
-        }
-        if (next.splitMode) {
-          setSplitMode(next.splitMode);
-        }
-        if (transitionChanged && nextTransitionValue !== undefined) {
-          lastTransitionRef.current = nextTransitionValue;
-          setTransition(nextTransitionValue);
-        }
-      });
-    });
-  }, [setSplitMode, setThemeRight, setTransition]);
-
-  useEffect(() => {
-    return () => {
-      if (rafRef.current !== null) {
-        window.cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, []);
 
   useMotionValueEvent(scrollYProgress, "animationStart", () => {
     if (!right) return;

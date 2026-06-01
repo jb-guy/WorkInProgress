@@ -1,8 +1,9 @@
 import { animate, useInView } from "motion/react";
 import type { Theme } from "../context/ThemeContext";
-import { useSplitTransition, useTheme } from "../context/ThemeContext";
+import { useTheme } from "../context/ThemeContext";
 import HeroThemeScene from "../three/HeroThemeScene";
 import { useEffect, useRef } from "react";
+import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 
 const HeroOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) => {
@@ -20,7 +21,7 @@ const HeroOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) =
 
 const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) => {
   const { setThemeRight, setThemeLeft } = useTheme();
-  const { setTransition, setSplitMode } = useSplitTransition();
+  const queueSceneUpdate = useQueuedSceneUpdate();
 
   const handleCta = () => {
     
@@ -28,19 +29,18 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
 
   useEffect(() => {
     if(right) return;
-    setSplitMode("circle");
-    setThemeRight("holographic");
+    queueSceneUpdate({ splitMode: "circle", themeRight: "holographic" });
     animate(0,1, {
       delay: 1.5,
       duration: 0.8,
       onUpdate(value) {
-        setTransition(value);
+        queueSceneUpdate({ transition: value });
       },
       onComplete() {
         setThemeLeft("holographic");
       }
     });
-  }, []);
+  }, [queueSceneUpdate, setThemeLeft]);
       
 
   return (
