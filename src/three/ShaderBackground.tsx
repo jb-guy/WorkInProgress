@@ -119,7 +119,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   value *= 2.0;
 	value = clamp(value, 0.0, 1.0);
 	
-	fragColor = vec4(texture(uTexture, fragCoord / uResolution.xy).rgb * vec3(value*(uProgress-0.2)/0.8),value);
+	fragColor = vec4(texture(uTexture, fragCoord / uResolution.xy).rgb * vec3(value*(uProgress-0.2)/0.4),value);
 	return;
 }
 

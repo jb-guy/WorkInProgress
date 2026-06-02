@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./css/effects/cinematic-noise.css";
 
 @custom-variant wireframe (&:where([data-theme="wireframe"] *));
 @custom-variant dark (&:where([data-theme="dark"] *));

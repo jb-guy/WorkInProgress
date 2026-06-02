@@ -1,32 +1,44 @@
 [data-theme="cybernoir"] {
-  --theme-title-color: #f3f4f6;
+
+  --light: #f3f4f6;
+  --dark: #000b1e;
+  --primary-color: #ce1717;
+  --secondary-color: #a5f3fc;
+  --tertiary-color: #09DCC9;
+  --muted-color: #164e63;
+
+  --theme-title-color: var(--light);
   --theme-title-font: "Inter", "Segoe UI", sans-serif;
 
 
-  --theme-text-color: #f3f4f6;
-  --theme-sub-color: #d21717;
+  --theme-text-color: var(--light);
+  --theme-sub-color: var(--primary-color);
 
-  --theme-card-bg: color-mix(in srgb, #164e63 55%, transparent);
-  --theme-card-border-radius: 2rem;
-  --theme-card-padding: 1rem;
+  --theme-card-bg: var(--dark);
+  --theme-card-border-width: 1px;
+  --theme-card-border-color: var(--primary-color);
+  --theme-card-padding: 0.75rem;
   --theme-card-margin: 1rem;
-  --theme-card-text: #a5f3fc;
-  --theme-card-box-sizing: content-box;
+  --theme-card-text-color: var(--light);
 
-  --theme-button-bg: #140f1d80;
-  --theme-button-border: 1px solid #d21717;
+  --theme-button-bg: var(--dark);
+  --theme-button-border: 1px solid var(--primary-color);
   --theme-button-border-radius: 9px;
   --theme-button-text: #ffffff;
   --theme-button-font: "IBM Plex Mono", "SFMono-Regular", monospace;
   --theme-button-transform: uppercase;
   --theme-button-letter-spacing: 0.1em;
 
-  --theme-bg: #140f1d;
+  --theme-bg: var(--dark);
+}
+
+[data-theme="cybernoir"] .theme-card {
+  box-shadow: 0 0 20px var(--primary-color);
 }
 
 [data-theme="cybernoir"] h1::after,
 [data-theme="cybernoir"] h2::after {
   position: absolute;
-  color: #d21717;
+  color: var(--primary-color);
   content: "_";
 }

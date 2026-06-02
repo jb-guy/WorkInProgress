@@ -2,8 +2,9 @@ import type { Theme } from "../context/ThemeContext";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
 import SphereMenu from "../three/SphereMenu";
 import ShaderBackground from "../three/ShaderBackground"
-import { useEffect, useMemo, useRef } from "react";
-import { motion, useInView } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll } from "motion/react";
+import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 const toSvgDataUri = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 const WORK_SECTION_ID = "work";
@@ -51,44 +52,87 @@ const items = [
   }
 ];
 
-const WorkOuterContent = ({ theme }: { theme: Theme }) => {
+const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const { hoveredItemId, focusedItemId, activeItemId } = useSectionInteraction(WORK_SECTION_ID);
   const container = useRef<HTMLDivElement>(null);
   const isInView = useInView(container);
   
   const progress = useMemo(() => {
-    return (focusedItemId && isInView) ? 1.0 : 0.1;
+    return (focusedItemId && isInView) ? 0.6 : 0.1;
   }, [focusedItemId, isInView]);
 
   return (
-    <div className="work-theme z-10 theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center">
+    <div className="work-theme theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center">
       <div className="absolute w-[55vh] h-[55vh] top-[25vh] lg:top-[35vh]">
-        <div className="absolute inset-16 lg:inset-12 theme-border rounded-full"/>
+        <div ref={container} className="absolute inset-16 lg:inset-12 theme-border rounded-full"/>
       </div>
       <div className="absolute h-[100vw] w-[100vh] mt-[-15vh] lg:mt-[25vh] min-w-screen min-h-screen">
+        {theme === "cybernoir" && (
+          <img src="/cyberworkbg.png" alt="cybernoir theme overlay" className="absolute inset-0 scale-200 lg:scale-150 lg:top-10 object-cover pointer-events-none" />
+        )}
         <ShaderBackground image={items.find(item => item.id === activeItemId)?.background} progress={progress} />
-        <div ref={container} className="absolute h-0 w-full top-1/2" />
       </div>
     </div>
   );
 };
 
-const WorkInnerContent = ({ theme }: { theme: Theme }) => {
-  const {hoveredItemId, focusedItemId, setFocusedItemId, setHoveredItemId} = useSectionInteraction(WORK_SECTION_ID);
+const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
+  const {focusedItemId, setFocusedItemId, setHoveredItemId} = useSectionInteraction(WORK_SECTION_ID);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [showHint, setShowHint] = useState<boolean>(true);
+
+  const queueSceneUpdate = useQueuedSceneUpdate();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["60% end", "90% end"],
+  });
+
+  useEffect(() => {
+    if (focusedItemId) {
+      setShowHint(false);
+    }
+  }, [focusedItemId]);
+
+  useMotionValueEvent(scrollYProgress, "animationStart", () => {
+    if (!right) return;
+    queueSceneUpdate({ transition: 1 });
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    console.log("Work section scroll progress:", right);
+    if (!right) return;
+    queueSceneUpdate({
+      themeLeft: "retro80",
+      themeRight: "cybernoir",
+      splitMode: "square",
+      transition: latest,
+    });
+  });
 
   const closeItem = () => {
     setFocusedItemId(null);
   };
 
   return (
-    <div className="relative work-theme flex h-[120vh] lg:h-screen w-full flex-col items-start pt-18">
+    <div ref={sectionRef} className="relative work-theme flex h-[120vh] lg:h-screen w-full flex-col items-start pt-18">
       <p className="theme-sub ml-4 sm:ml-8 mb-2 text-xs uppercase tracking-widest">
         02 — Work
       </p>
       <div className="w-full h-0 theme-border" />
-      <h2 className="theme-title theme-bg w-full ml-4 sm:ml-8 pt-4 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-7xl">
+      <h2 className="theme-title w-full ml-4 sm:ml-8 pt-4 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-7xl">
         Selected work
       </h2>
+      <AnimatePresence>
+        {showHint && (
+          <motion.p
+            animate={{ opacity: [0.5, 1, 0.5], y: 0, transition: { duration: 1, ease: "easeInOut", repeat: showHint ? Infinity : 0 } }}
+            exit={{ opacity: 0, y: 20 }}
+            className="theme-sub inset-0 mx-auto mt-20 text-3xl"
+          >
+            Grab the project sphere and explore
+          </motion.p>
+        )}
+      </AnimatePresence>
       <div className="absolute top-[30vh] lg:top-[35vh] h-[55vh] w-full flex flex-col lg:flex-row justify-between">
         <div className="theme-border grow min-h-[45vh] flex flex-col items-center">
           <div 
@@ -108,18 +152,23 @@ const WorkInnerContent = ({ theme }: { theme: Theme }) => {
             <div className="absolute inset-x-1 inset-y-4.5 border -rotate-45 origin-center"/>
           </motion.button>
         </div>
-        <div className=" z-200 md:order-first theme-card relative lg:w-1/4 pointer-events-auto flex flex-col">
-          <h3 className="theme-text text-3xl font-bold">{items[Number(focusedItemId)]?.title}</h3>
-          <p className="theme-sub mt-6">{items[Number(focusedItemId)]?.subtitle}</p>
-          <p className="theme-sub opacity-50 mt-1 text-sm">{items[Number(focusedItemId)]?.date}</p>
-          <p className="theme-sub hidden lg:block mt-8 text-sm">{items[Number(focusedItemId)]?.description}</p>
-          <button onClick={() => window.open(items[Number(focusedItemId)]?.link, "_blank")} className="self-end mt-8 px-4 py-2 border border-current theme-sub text-sm uppercase tracking-widest hover:bg-current/10 transition-colors">
-            View project
-          </button>
-        </div>
-        <div className="z-200 hidden lg:block theme-card w-1/4 pointer-events-auto text-right">
-          <h3 className="theme-text text-3xl font-bold">Stack used</h3>
-        </div>
+        <AnimatePresence>
+          {focusedItemId &&
+          (<>
+          <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} className="z-200 md:order-first theme-card relative lg:w-1/4 pointer-events-auto flex flex-col">
+            <h3 className="text-3xl">{items[Number(focusedItemId)]?.title}</h3>
+            <p className="theme-sub mt-6">{items[Number(focusedItemId)]?.subtitle}</p>
+            <p className="theme-sub opacity-50 text-sm">{items[Number(focusedItemId)]?.date}</p>
+            <p className="hidden lg:block mt-8 text-sm">{items[Number(focusedItemId)]?.description}</p>
+            <button onClick={() => window.open(items[Number(focusedItemId)]?.link, "_blank")} className="self-end mt-8 px-4 py-2 border border-current theme-sub text-sm uppercase tracking-widest hover:bg-current/10 transition-colors">
+              View project
+            </button>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} className="z-200 hidden lg:block theme-card w-1/4 pointer-events-auto text-right">
+            <h3 className="text-3xl">Stack used</h3>
+          </motion.div>
+          </>)}
+        </AnimatePresence>
       </div>
       <div className="w-full h-0 theme-border" />
     </div>
@@ -128,11 +177,12 @@ const WorkInnerContent = ({ theme }: { theme: Theme }) => {
 
 type SectionThemeProps = {
   theme: Theme;
+  right?: boolean;
 };
 
-const WorkOuter = ({ theme }: SectionThemeProps) => <WorkOuterContent theme={theme} />;
+const WorkOuter = ({ theme, right }: SectionThemeProps) => <WorkOuterContent theme={theme} right={right} />;
 
-const WorkInner = ({ theme }: SectionThemeProps) => <WorkInnerContent theme={theme} />;
+const WorkInner = ({ theme, right }: SectionThemeProps) => <WorkInnerContent theme={theme} right={right} />;
 
 const Work = { Outer: WorkOuter, Inner: WorkInner };
 export default Work;

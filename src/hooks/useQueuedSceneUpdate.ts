@@ -4,6 +4,7 @@ import { useSplitTransition, useTheme, type SplitMode, type Theme } from "../con
 
 export type SceneUpdate = {
   themeRight?: Theme;
+  themeLeft?: Theme;
   splitMode?: SplitMode;
   splitAngleDeg?: number;
   transition?: number;
@@ -11,7 +12,7 @@ export type SceneUpdate = {
 };
 
 export const useQueuedSceneUpdate = () => {
-  const { setThemeRight } = useTheme();
+  const { setThemeRight, setThemeLeft } = useTheme();
   const {
     setTransition,
     setSplitMode,
@@ -45,6 +46,9 @@ export const useQueuedSceneUpdate = () => {
         if (next.themeRight) {
           setThemeRight(next.themeRight);
         }
+        if (next.themeLeft) {
+          setThemeLeft(next.themeLeft);
+        }
         if (next.splitMode) {
           setSplitMode(next.splitMode);
         }
@@ -60,7 +64,7 @@ export const useQueuedSceneUpdate = () => {
         }
       });
     });
-  }, [setSplitAngleDeg, setSplitMode, setThemeRight, setThemeRightOpacity, setTransition]);
+  }, [setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
 
   /* 
   useEffect(() => {

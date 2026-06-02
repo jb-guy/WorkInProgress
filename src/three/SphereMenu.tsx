@@ -246,7 +246,7 @@ export default ({ size, items, className }: { size: number, items: Item[], class
   }, []);
 
   return (
-    <div className={`h-full w-full cursor-grab ${className}`} onMouseDown={(e)=>{e.preventDefault()}}>
+    <div className={`h-full w-full cursor-grab will-change-transform ${className}`} onMouseDown={(e)=>{e.preventDefault()}}>
       <Canvas
         dpr={[1, maxDpr]}
         gl={{ antialias: false, alpha: true }}

@@ -8,6 +8,7 @@
 
   --theme-title-color: var(--primary-color);
   --theme-title-font: "Inter", "Segoe UI", sans-serif;
+  --theme-title-weight: 900;
   --theme-title-transform: none;
 
   --theme-sub-color: var(--secondary-color);

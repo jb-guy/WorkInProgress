@@ -5,6 +5,8 @@
 .theme-title {
   color: var(--theme-title-color, inherit);
   font-family: var(--theme-title-font, inherit);
+  font-weight: var(--theme-title-weight, normal);
+  letter-spacing: var(--theme-title-letter-spacing, normal);
   text-transform: var(--theme-title-transform, none);
   pointer-events: auto;
 }
@@ -29,11 +31,11 @@
   background-clip: var(--theme-card-background-clip, none);
   color: var(--theme-card-text-color, inherit);
   border: var(--theme-card-border, none);
-  border-color: var(--theme-card-border-color, currentColor);
+  border-color: var(--theme-card-border-color, none);
   border-image: var(--theme-card-border-image, none);
-  border-width: var(--theme-card-border-width, 0px);
-  border-style: var(--theme-card-border-style, solid);
-  border-radius: var(--theme-card-border-radius, 0);
+  border-width: var(--theme-card-border-width, inherit);
+  border-style: var(--theme-card-border-style, inherit);
+  border-radius: var(--theme-card-border-radius, none);
   padding: var(--theme-card-padding, 2rem);
   margin: var(--theme-card-margin, 0rem);
   pointer-events: auto;

@@ -32,20 +32,22 @@
   --theme-button-letter-spacing: 0.1em;
 }
 
-[data-theme="retro80"] .theme-card::after{
+[data-theme="retro80"] .about-theme .theme-card::after{
   content: "";
   position: absolute;
+  z-index: 10;
   background: var(--darker-color);
 }
 
-[data-theme="retro80"] .theme-card::before{
+[data-theme="retro80"] .about-theme .theme-card::before{
   content: "";
   position: absolute;
+  z-index: 10;
   background: var(--darker-color);
 }
 
 @media (min-width: 1024px) {
- [data-theme="retro80"] .theme-card::after{
+ [data-theme="retro80"] .about-theme .theme-card::after{
     top: 0;
     right: 2vw;
     width: 2vw;
@@ -53,7 +55,7 @@
     box-shadow: inset -1vw 0 0 0 var(--muted-color), 1vw 0 0 0 var(--primary-color), 2vw 0 0 0 var(--secondary-color), 3vw 0 0 0 var(--tertiary-color);
   }
 
-  [data-theme="retro80"] .theme-card::before{
+  [data-theme="retro80"] .about-theme .theme-card::before{
     top: 0;
     left: 2vw;
     width: 2vw;
@@ -64,7 +66,7 @@
 
 @media (max-width: 1024px){
   [data-theme="retro80"] .theme-card::after{
-    bottom: 2vh;
+    bottom: 0;
     left: 0;
     width: 100%;
     height: 2vh;
@@ -72,7 +74,7 @@
   }
 
   [data-theme="retro80"] .theme-card::before{
-    top: 2vh;
+    top: 0;
     left: 0;
     width: 100%;
     height: 2vh;

@@ -11,10 +11,12 @@
 
   --theme-bg: var(--dark);
 
-  --theme-title-color: #ffffff;
+  --theme-title-color: var(--dark);
   --theme-title-font: "Inter", "Segoe UI", sans-serif;
+  --theme-title-weight: 100;
+  --theme-title-letter-spacing: 0.06em;
 
-  --theme-text-color: var(--light);
+  --theme-text-color: var(--dark);
   --theme-text-font: "Inter", "Segoe UI", sans-serif;
   --theme-sub-color: #c919c3;
 
@@ -37,6 +39,9 @@
   --theme-button-letter-spacing: 0.1em;
 }
 
+[data-theme="holographic"] .hero-theme {
+}
+
 
 [data-theme="holographic"] .theme-card>* {
   margin: 18px;
@@ -46,7 +51,7 @@
   position: relative;
   overflow: hidden;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 8px 16px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
     inset 0 0 20px 10px rgba(255, 255, 255, 1);
