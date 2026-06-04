@@ -17,18 +17,18 @@ interface Item {
 }
 
 const ItemCard = ({ item, visible }: { item: Item; visible: boolean }) => {
-  const { focusedItemId } = useSectionInteraction("work");
+  const { activeItemId } = useSectionInteraction("work");
 
   return (
     <Html
       transform
-      style={{ opacity: visible ? 1 : 0.001 }}
+      style={{ opacity: visible ? 1 : 0.3 }}
       zIndexRange={[100, 0]}
       distanceFactor={15}
     >
-      <motion.div transition={{duration:focusedItemId ? 1.0 : 0.5, ease: "backInOut"}} animate={{scale: focusedItemId ? 0.2 : 1}} className="flex flex-col items-center pointer-events-none select-none">
+      <motion.div transition={{duration:activeItemId ? 1.0 : 0.5, ease: "backInOut"}} animate={{scale: activeItemId ? 0.2 : 1}} className="flex flex-col items-center pointer-events-none select-none">
         <img src={item.image} alt={item.title} className="w-24 h-24 object-cover mb-2 rounded-full transition-all delay-300" />
-        <motion.img transition={{duration: 0.5, ease: "backInOut"}} animate={{opacity: focusedItemId === item.id ? 0 : 1}} src={item.image} alt={item.title} className="absolute w-24 h-24 object-cover rounded-full grayscale" />
+        <motion.img transition={{duration: 0.5, ease: "backInOut"}} animate={{opacity: activeItemId === item.id ? 0 : 1}} src={item.image} alt={item.title} className="absolute w-24 h-24 object-cover rounded-full grayscale" />
       </motion.div>
     </Html>
   )
@@ -69,36 +69,34 @@ const ItemBillboard = ({ item, normal, scale }: { item: Item; normal: THREE.Vect
   );
 };
 
+const geometry = new THREE.IcosahedronGeometry(1, 1);
+const pos = geometry.attributes.position;
+
+const tri = new THREE.Triangle();
+const a = new THREE.Vector3();
+const b = new THREE.Vector3();
+const c = new THREE.Vector3();
+
+const normalArray: THREE.Vector3[] = [];
+
+for (let f = 0; f < pos.count / 3; f += 1) {
+  const idxBase = f * 3;
+  const normal = new THREE.Vector3();
+  a.fromBufferAttribute(pos, idxBase + 0);
+  b.fromBufferAttribute(pos, idxBase + 1);
+  c.fromBufferAttribute(pos, idxBase + 2);
+  tri.set(a, b, c);
+  tri.getNormal(normal);
+  normalArray.push(normal);
+}
+
+geometry.dispose();
+
 const ItemsIcosahedron = memo(({ items }: { items: Item[] }) => {
-  const normals = useMemo(() => {
-    const geometry = new THREE.IcosahedronGeometry(1, 1);
-    const pos = geometry.attributes.position;
-
-    const tri = new THREE.Triangle();
-    const a = new THREE.Vector3();
-    const b = new THREE.Vector3();
-    const c = new THREE.Vector3();
-
-    const normalArray: THREE.Vector3[] = [];
-
-    for (let f = 0; f < pos.count / 3; f += 1) {
-      const idxBase = f * 3;
-      const normal = new THREE.Vector3();
-      a.fromBufferAttribute(pos, idxBase + 0);
-      b.fromBufferAttribute(pos, idxBase + 1);
-      c.fromBufferAttribute(pos, idxBase + 2);
-      tri.set(a, b, c);
-      tri.getNormal(normal);
-      normalArray.push(normal);
-    }
-
-    geometry.dispose();
-    return normalArray;
-  }, []);
 
   return (
     <>
-      {normals.map((normal, index) => (
+      {normalArray.map((normal, index) => (
         <ItemBillboard
           key={index}
           item={items[index % items.length]}
@@ -115,11 +113,18 @@ var activeCamera : THREE.PerspectiveCamera | null = null;
 const SphereScene = ({ size, items, className }: { size: number, items: Item[], className?: string }) => {
 
 
-  const { interaction, focusedItemId, setInteraction, setActiveItemId, setFocusedItemId } = useSectionInteraction("work");
+  const { interaction, setInteraction, setActiveItemId, setFocusedItemId } = useSectionInteraction("work");
 
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const trackballRef = useRef<any | null>(null);
   const icosahedronRef = useRef<THREE.Mesh | null>(null);
+  // Stable refs — never reallocated per render.
+  const mouseDownTimeRef = useRef(0);
+  const raycastRef = useRef(new THREE.Raycaster());
+  const raycastTimeRef = useRef(0);
+  const targetPositionRef = useRef(new THREE.Vector3());
+  const originalPositionRef = useRef(new THREE.Vector3());
+  const currentAnimationRef = useRef<ReturnType<typeof animate> | null>(null);
 
 
   const updateCameraPosition = () => {
@@ -140,12 +145,13 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
   }, [interaction]);
 
   const onMouseDown = () => {
+    mouseDownTimeRef.current = Date.now();
     setInteraction("dragging");
-    setFocusedItemId(null);
-    activeCamera = cameraRef.current;
+    setActiveItemId(null);
     if (!cameraRef.current) return;
 
-    animate(cameraRef.current.zoom, 1, {
+    activeCamera = cameraRef.current;
+    currentAnimationRef.current = animate(cameraRef.current.zoom, 1, {
       duration: 0.5,
       onUpdate: (latest) => {
         if (cameraRef.current) {
@@ -153,65 +159,86 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
           cameraRef.current.updateProjectionMatrix();
         }
       },
-      onComplete: () => {
-        if(focusedItemId) return;
-        setActiveItemId(null);
-      }
     });
-  }
+  };
 
-  const targetPosition = new THREE.Vector3();
-  const originalPosition = new THREE.Vector3()
-  const raycast = new THREE.Raycaster();
+  const onMouseChange = () => {
+    if (Date.now() - raycastTimeRef.current < 200) return;
+    raycastTimeRef.current = Date.now();
+    if (!cameraRef.current) return;
+
+    raycastRef.current.setFromCamera(new THREE.Vector2(0, 0), cameraRef.current);
+    const downIntersects = raycastRef.current.intersectObjects(
+      icosahedronRef.current ? [icosahedronRef.current] : [],
+      true
+    );
+    if (downIntersects.length > 0) {
+      setFocusedItemId(String(downIntersects[0].faceIndex! % items.length));
+    }
+  }
 
   const onMouseUp = () => {
     if (interaction !== "dragging") return;
     if (!cameraRef.current) return;
 
-    animate(cameraRef.current.zoom, 15, {
+    const isClick = Date.now() - mouseDownTimeRef.current < 250;
+
+    if (isClick) {
+      // Pure click (no drag): unfocus everything.
+      setActiveItemId(null);
+      setFocusedItemId(null);
+      setInteraction(null);
+      return;
+    }
+
+    // Drag end: zoom in, then snap camera toward the confirmed face.
+    currentAnimationRef.current = animate(cameraRef.current.zoom, 15, {
       duration: 0.7,
       ease: "easeInOut",
       onUpdate: (latest) => {
         if (cameraRef.current) {
-          cameraRef.current.zoom = latest; // zoom in a bit
+          cameraRef.current.zoom = latest;
           cameraRef.current.updateProjectionMatrix();
         }
-      }
+      },
     });
 
     animate(0, 1, {
       duration: 0.5,
       ease: "easeInOut",
       onPlay: () => {
-        {/* Use raycast to determine the face in front and set camera angle to face angle */ }
-        
-        raycast.setFromCamera(new THREE.Vector2(0, 0), cameraRef.current!);
-        const intersects = raycast.intersectObjects(icosahedronRef.current ? [icosahedronRef.current] : [], true);
-        if (intersects.length == 0) return;
-        setFocusedItemId(String(intersects[0].faceIndex!%items.length));
-        setActiveItemId(String(intersects[0].faceIndex!%items.length));
-        const targetFace = intersects[0].face;
-        const normalMatrix = new THREE.Matrix3().getNormalMatrix(intersects[0].object.matrixWorld);
-        const worldNormal = targetFace!.normal.clone().applyMatrix3(normalMatrix).normalize();
-        targetPosition.copy(worldNormal.multiplyScalar(40/size));
-        originalPosition.copy(cameraRef.current!.position);
+        // Raycast #2 on release: confirm face → activeItemId (persistent, drives panel + full shader).
+        raycastRef.current.setFromCamera(new THREE.Vector2(0, 0), cameraRef.current!);
+        const upIntersects = raycastRef.current.intersectObjects(
+          icosahedronRef.current ? [icosahedronRef.current] : [],
+          true
+        );
+        if (upIntersects.length === 0) return;
+
+        const faceItemId = String(upIntersects[0].faceIndex! % items.length);
+        setFocusedItemId(faceItemId);
+        setActiveItemId(faceItemId);
+        setInteraction(null);
+
+        const targetFace = upIntersects[0].face!;
+        const normalMatrix = new THREE.Matrix3().getNormalMatrix(upIntersects[0].object.matrixWorld);
+        const worldNormal = targetFace.normal.clone().applyMatrix3(normalMatrix).normalize();
+        targetPositionRef.current.copy(worldNormal.multiplyScalar(40 / size));
+        originalPositionRef.current.copy(cameraRef.current!.position);
       },
       onUpdate: (latest) => {
         if (cameraRef.current) {
           cameraRef.current.position.set(
-            originalPosition.x + (targetPosition.x - originalPosition.x) * latest,
-            originalPosition.y + (targetPosition.y - originalPosition.y) * latest,
-            originalPosition.z + (targetPosition.z - originalPosition.z) * latest
+            originalPositionRef.current.x + (targetPositionRef.current.x - originalPositionRef.current.x) * latest,
+            originalPositionRef.current.y + (targetPositionRef.current.y - originalPositionRef.current.y) * latest,
+            originalPositionRef.current.z + (targetPositionRef.current.z - originalPositionRef.current.z) * latest
           );
           cameraRef.current.lookAt(0, 0, 0);
           cameraRef.current.updateProjectionMatrix();
         }
       },
-      onComplete: () => {
-        setInteraction(null);
-      }
     });
-  }
+  };
 
   return (
     <>
@@ -225,6 +252,7 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
         staticMoving={true}
         onStart={onMouseDown}
         onEnd={onMouseUp}
+        onChange={onMouseChange}
       />
       <ambientLight intensity={0.72} />
       {/*Placing items[0].image at every face of the icosahedron for now */}

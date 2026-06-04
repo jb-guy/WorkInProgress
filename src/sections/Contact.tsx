@@ -10,12 +10,12 @@ const ContactOuterContent = ({ theme }: { theme: Theme }) => (
 
 const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const { setThemeRight } = useTheme();
+  const { setDevMode } = useTheme();
   const queueSceneUpdate = useQueuedSceneUpdate();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["30% center", "40% center"],
+    offset: ["30% center", "70% center"],
   });
 
   useMotionValueEvent(scrollYProgress, "animationStart", () => {
@@ -26,9 +26,10 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!right) return;
     queueSceneUpdate({
-      themeRight: "cybernoir",
-      splitMode: "horizontal",
-      transition: 1 - latest,
+      themeLeft: "cybernoir",
+      themeRight: "wireframe",
+      splitMode: "circle",
+      transition: latest,
     });
   });
 
@@ -53,8 +54,11 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
         <button onClick={() => window.location.href = "mailto:jeanbaptiste.guy2358@gmail.com"} className="theme-link mt-6">
           Send me an email
         </button>
-        <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-link mt-4">
+        <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-link">
           Visit my LinkedIn
+        </button>
+        <button onClick={() => {setDevMode(true)}} >
+          Unlock Style tool
         </button>
       </div>
       <div className="min-w-[15vw] w-[20vw] h-full theme-spacer" />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
 import { useSplitTransition, useTheme, type SplitMode, type Theme } from "../context/ThemeContext";
+import { transitionRef } from "../utils/transitionRef";
 
 export type SceneUpdate = {
   themeRight?: Theme;
@@ -11,10 +12,11 @@ export type SceneUpdate = {
   themeRightOpacity?: number;
 };
 
+const lastTransitionDetails = {current: null as SceneUpdate | null};
+
 export const useQueuedSceneUpdate = () => {
-  const { setThemeRight, setThemeLeft } = useTheme();
+  const { devMode, setThemeRight, setThemeLeft } = useTheme();
   const {
-    setTransition,
     setSplitMode,
     setSplitAngleDeg,
     setThemeRightOpacity,
@@ -22,9 +24,10 @@ export const useQueuedSceneUpdate = () => {
 
   const rafRef = useRef<number | null>(null);
   const pendingUpdateRef = useRef<SceneUpdate | null>(null);
-  const lastTransitionRef = useRef<number>(-1);
+  const lastUpdateTimeRef = useRef<number>(0);
 
   const queueSceneUpdate = useCallback((update: SceneUpdate) => {
+    if (devMode) return;
     pendingUpdateRef.current = {
       ...pendingUpdateRef.current,
       ...update,
@@ -36,45 +39,42 @@ export const useQueuedSceneUpdate = () => {
       rafRef.current = null;
       const next = pendingUpdateRef.current;
       pendingUpdateRef.current = null;
-      if (!next) return;
+      if (!next || Date.now() - lastUpdateTimeRef.current < 16) return;
 
-      const nextTransition = next.transition;
-      const shouldWriteTransition =
-        nextTransition !== undefined && Math.abs(nextTransition - lastTransitionRef.current) >= 0.002;
-
+      lastUpdateTimeRef.current = Date.now();
       flushSync(() => {
-        if (next.themeRight) {
+        if (next.themeRight && next.themeRight !== lastTransitionDetails.current?.themeRight) {
           setThemeRight(next.themeRight);
         }
-        if (next.themeLeft) {
+        if (next.themeLeft && next.themeLeft !== lastTransitionDetails.current?.themeLeft) {
           setThemeLeft(next.themeLeft);
         }
-        if (next.splitMode) {
+        if (next.splitMode && next.splitMode !== lastTransitionDetails.current?.splitMode) {
           setSplitMode(next.splitMode);
         }
-        if (next.splitAngleDeg !== undefined) {
+        if (next.splitAngleDeg !== undefined && next.splitAngleDeg !== lastTransitionDetails.current?.splitAngleDeg) {
           setSplitAngleDeg(next.splitAngleDeg);
         }
-        if (next.themeRightOpacity !== undefined) {
+        if (next.themeRightOpacity !== undefined && next.themeRightOpacity !== lastTransitionDetails.current?.themeRightOpacity) {
           setThemeRightOpacity(next.themeRightOpacity);
         }
-        if (shouldWriteTransition && nextTransition !== undefined) {
-          lastTransitionRef.current = nextTransition;
-          setTransition(nextTransition);
+        if (next.transition !== undefined && next.transition !== lastTransitionDetails.current?.transition) {
+          transitionRef.current = next.transition;
+          window.dispatchEvent(new CustomEvent("styleTransitionUpdate", { detail: { transition: next.transition } }));
         }
       });
+      lastTransitionDetails.current = { ...lastTransitionDetails.current, ...next };
     });
-  }, [setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
+  }, [devMode, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity]);
 
-  /* 
-  useEffect(() => {
+  /*useEffect(() => {
     return () => {
       console.log("Cleaning up scene update hook");
       if (rafRef.current !== null) {
         window.cancelAnimationFrame(rafRef.current);
       }
     };
-  }, []); */
+  }, []);*/
 
   return queueSceneUpdate;
 };

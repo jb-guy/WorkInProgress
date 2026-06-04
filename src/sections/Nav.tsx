@@ -68,7 +68,7 @@ const ThemeSelect = ({
 const getPalette = (theme: Theme) => {
   const darkChrome = isDarkTheme(theme);
   return {
-    frameClass: darkChrome ? "border-white/30" : "border-stone-900/35",
+    frameClass: darkChrome ? "border-white/50" : "border-stone-900/35",
     separatorClass: darkChrome
       ? "border-white/25 text-white bg-black/20"
       : "border-stone-900/30 text-stone-900 bg-white/40",

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { isDarkTheme, useSplitTransition, useTheme, type SplitMode, type Theme } from "../context/ThemeContext";
+import { transitionRef } from "../utils/transitionRef";
 import { NavControlsBar, NavStatusBadge, NavWindow, type SectionId } from "../sections/Nav";
 import Hero from "../sections/Hero";
 import About from "../sections/About";
@@ -25,7 +26,7 @@ const getTransitionStyle = (
 ): string => {
   switch (splitMode) {
     case "vertical":
-      return `clip-path: polygon(${transition * 100}% 0,100% 0, 100% 100%, ${transition * 100}% 100%)`;
+      return `clip-path: polygon(${(1-transition) * 100}% 0,100% 0, 100% 100%, ${(1-transition) * 100}% 100%)`;
     case "horizontal":
       return `clip-path: polygon(0% ${(1 - transition) * 100}%, 100% ${(1 - transition) * 100}%,100% 100%, 0% 100%)`;
     case "angled": {
@@ -72,15 +73,15 @@ function SplitHandle({
   lineRef: React.RefObject<HTMLDivElement | null>;
   dominantTheme: Theme;
 }) {
-  const { transition, splitMode, splitAngleDeg } = useSplitTransition();
+  const { splitMode, splitAngleDeg } = useSplitTransition();
   const isDark = isDarkTheme(dominantTheme);
   const effectiveSplitX = Math.max(
     20,
-    Math.min(transition * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
+    Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
   );
   const effectiveSplitY = Math.max(
     20,
-    Math.min(transition * (typeof window !== "undefined" ? window.innerHeight : 760), typeof window !== "undefined" ? window.innerHeight - 20 : 760)
+    Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerHeight : 760), typeof window !== "undefined" ? window.innerHeight - 20 : 760)
   );
   const lineClass = isDark ? "bg-white/30" : "bg-stone-900/35";
   const pipClass = isDark ? "border-white/40 bg-white/10" : "border-stone-900/30 bg-white/80";
@@ -131,7 +132,7 @@ export default function SplitViewport() {
   const [viewportWidth, setViewportWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
   const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 800);
   const { themeLeft, themeRight, devMode } = useTheme();
-  const { setTransition, transition, splitMode, splitAngleDeg, themeRightOpacity } = useSplitTransition();
+  const { setTransition, splitMode, splitAngleDeg, themeRightOpacity } = useSplitTransition();
 
   const appRootRef = useRef<HTMLDivElement>(null);
   const outerLeftClipRef = useRef<HTMLDivElement>(null);
@@ -148,9 +149,9 @@ export default function SplitViewport() {
   const scrollRafRef = useRef<number | null>(null);
 
   const updateRootClips = useCallback(() => {
-    applyClipPath(outerRightClipRef.current, splitMode, splitAngleDeg, transition, themeRightOpacity);
-    applyClipPath(innerRightClipRef.current, splitMode, splitAngleDeg, transition, themeRightOpacity);
-  }, [splitMode, splitAngleDeg, transition, themeRightOpacity]);
+    applyClipPath(outerRightClipRef.current, splitMode, splitAngleDeg, transitionRef.current, themeRightOpacity);
+    applyClipPath(innerRightClipRef.current, splitMode, splitAngleDeg, transitionRef.current, themeRightOpacity);
+  }, [splitMode, splitAngleDeg, themeRightOpacity]);
 
   useEffect(() => {
     const applyScrollFrame = () => {
@@ -177,8 +178,10 @@ export default function SplitViewport() {
 
     applyScrollFrame();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("styleTransitionUpdate", onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("styleTransitionUpdate", onScroll);
       if (scrollRafRef.current !== null) {
         window.cancelAnimationFrame(scrollRafRef.current);
       }
@@ -215,11 +218,11 @@ export default function SplitViewport() {
     if (!isDragging.current) return;
     if (splitMode === "horizontal") {
       const y = Math.max(40, Math.min(e.clientY, window.innerHeight - 40));
-      setTransition(y / window.innerHeight);
+      setTransition((window.innerHeight-y) / window.innerHeight);
       return;
     }
     const x = Math.max(40, Math.min(e.clientX, window.innerWidth - 40));
-    setTransition(x / window.innerWidth);
+    setTransition((window.innerWidth - x) / window.innerWidth);
   }, [setTransition, splitMode]);
 
   const onPointerUp = useCallback(() => {
@@ -239,7 +242,7 @@ export default function SplitViewport() {
     window.addEventListener("pointerup", onPointerUp);
   }, [onPointerMove, onPointerUp, splitMode]);
 
-  const dominantTheme: Theme = transition <= 0.5 ? themeLeft : themeRight;
+  const dominantTheme: Theme = transitionRef.current <= 0.5 ? themeLeft : themeRight;
 
   const outerLeftSections = useMemo(() => SECTIONS.map((section) => (
     <div key={`outer-left-${section.id}`} className="w-full">

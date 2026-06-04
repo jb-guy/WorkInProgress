@@ -119,7 +119,12 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   value *= 2.0;
 	value = clamp(value, 0.0, 1.0);
 	
-	fragColor = vec4(texture(uTexture, fragCoord / uResolution.xy).rgb * vec3(value*(uProgress-0.2)/0.4),value);
+	vec4 color = texture(uTexture, fragCoord / uResolution.xy);
+	if(color.a == 0.0){
+		color = vec4(1.0);
+	}
+
+	fragColor = vec4(color.rgb / vec3(clamp(value*(uProgress-0.1)/0.1, 0.0, 1.0)),value);
 	return;
 }
 
@@ -138,6 +143,19 @@ type Props = {
 };
 
 const textureLoader = new THREE.TextureLoader();
+
+/** Module-level cache: each URL is fetched and uploaded to the GPU only once. */
+const textureCache = new Map<string, THREE.Texture>();
+
+export function preloadTextures(urls: string[]) {
+  urls.forEach((url) => {
+    if (!url || textureCache.has(url)) return;
+    textureLoader.loadAsync(url).then((tex) => {
+      tex.needsUpdate = true;
+      textureCache.set(url, tex);
+    });
+  });
+}
 
 function ShaderPlane({
   image,
@@ -164,12 +182,18 @@ function ShaderPlane({
 	useEffect(() => {
 		if (!mesh.current) return;
 		if (image) {
-			textureLoader.loadAsync(image).then((texture) => {
-				if (!mesh.current) return;
-				mesh.current.material.uniforms.uTexture.value = texture;
-			});
-		}
-		else {
+			const cached = textureCache.get(image);
+			if (cached) {
+				mesh.current.material.uniforms.uTexture.value = cached;
+			} else {
+				textureLoader.loadAsync(image).then((texture) => {
+					texture.needsUpdate = true;
+					textureCache.set(image, texture);
+					if (!mesh.current) return;
+					mesh.current.material.uniforms.uTexture.value = texture;
+				});
+			}
+		} else {
 			mesh.current.material.uniforms.uTexture.value = null;
 		}
 	}, [image]);

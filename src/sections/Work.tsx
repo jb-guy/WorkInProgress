@@ -1,7 +1,7 @@
 import type { Theme } from "../context/ThemeContext";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
 import SphereMenu from "../three/SphereMenu";
-import ShaderBackground from "../three/ShaderBackground"
+import ShaderBackground, { preloadTextures } from "../three/ShaderBackground"
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll } from "motion/react";
 import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
@@ -53,16 +53,23 @@ const items = [
 ];
 
 const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
-  const { hoveredItemId, focusedItemId, activeItemId } = useSectionInteraction(WORK_SECTION_ID);
+  const { focusedItemId, activeItemId } = useSectionInteraction(WORK_SECTION_ID);
   const container = useRef<HTMLDivElement>(null);
   const isInView = useInView(container);
-  
+
+  // focusedItemId = press/hover preview; activeItemId = confirmed after drag release.
+  const displayImage = useMemo(() => {
+    return items.find(item => item.id === (activeItemId ?? focusedItemId))?.background;
+  }, [focusedItemId, activeItemId]);
+
   const progress = useMemo(() => {
-    return (focusedItemId && isInView) ? 0.6 : 0.1;
-  }, [focusedItemId, isInView]);
+    if (activeItemId && isInView) return 0.75;   // fully confirmed
+    if (focusedItemId && isInView) return 0.25;  // preview on press
+    return 0.1;
+  }, [focusedItemId, activeItemId, isInView]);
 
   return (
-    <div className="work-theme theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center">
+    <div className="work-theme  z-10 theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center">
       <div className="absolute w-[55vh] h-[55vh] top-[25vh] lg:top-[35vh]">
         <div ref={container} className="absolute inset-16 lg:inset-12 theme-border rounded-full"/>
       </div>
@@ -70,14 +77,14 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
         {theme === "cybernoir" && (
           <img src="/cyberworkbg.png" alt="cybernoir theme overlay" className="absolute inset-0 scale-200 lg:scale-150 lg:top-10 object-cover pointer-events-none" />
         )}
-        <ShaderBackground image={items.find(item => item.id === activeItemId)?.background} progress={progress} />
+        <ShaderBackground image={displayImage} progress={progress} />
       </div>
     </div>
   );
 };
 
 const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
-  const {focusedItemId, setFocusedItemId, setHoveredItemId} = useSectionInteraction(WORK_SECTION_ID);
+  const { focusedItemId, setFocusedItemId, activeItemId, setActiveItemId } = useSectionInteraction(WORK_SECTION_ID);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [showHint, setShowHint] = useState<boolean>(true);
 
@@ -88,10 +95,15 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
   });
 
   useEffect(() => {
-    if (focusedItemId) {
+    if (activeItemId) {
       setShowHint(false);
     }
-  }, [focusedItemId]);
+  }, [activeItemId]);
+
+  // Preload all project backgrounds on mount so the shader never stalls on a cache miss.
+  useEffect(() => {
+    preloadTextures(items.map(i => i.background));
+  }, []);
 
   useMotionValueEvent(scrollYProgress, "animationStart", () => {
     if (!right) return;
@@ -99,7 +111,6 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    console.log("Work section scroll progress:", right);
     if (!right) return;
     queueSceneUpdate({
       themeLeft: "retro80",
@@ -111,6 +122,7 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
 
   const closeItem = () => {
     setFocusedItemId(null);
+    setActiveItemId(null);
   };
 
   return (
@@ -122,17 +134,15 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
       <h2 className="theme-title w-full ml-4 sm:ml-8 pt-4 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-7xl">
         Selected work
       </h2>
-      <AnimatePresence>
-        {showHint && (
-          <motion.p
-            animate={{ opacity: [0.5, 1, 0.5], y: 0, transition: { duration: 1, ease: "easeInOut", repeat: showHint ? Infinity : 0 } }}
-            exit={{ opacity: 0, y: 20 }}
-            className="theme-sub inset-0 mx-auto mt-20 text-3xl"
-          >
-            Grab the project sphere and explore
-          </motion.p>
-        )}
-      </AnimatePresence>
+      {showHint && (
+        <motion.p
+          animate={{ opacity: [0.5, 1, 0.5], y: 0, transition: { duration: 1, ease: "easeInOut", repeat: showHint ? Infinity : 0 } }}
+          exit={{ opacity: 0, y: 20 }}
+          className="theme-sub inset-0 mx-auto mt-20 text-3xl"
+        >
+          Grab the project sphere and explore
+        </motion.p>
+      )}
       <div className="absolute top-[30vh] lg:top-[35vh] h-[55vh] w-full flex flex-col lg:flex-row justify-between">
         <div className="theme-border grow min-h-[45vh] flex flex-col items-center">
           <div 
@@ -143,8 +153,8 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
           <div className="z-200 absolute w-screen h-[22.5vh] bottom-[-22.5vh] " />
           <p className="relative -top-8.5 self-start lg:self-center theme-sub theme-bg opacity-0 wireframe:opacity-100 text-xs p-2 theme-border w-fit">Project Viewer</p>
           <motion.button 
-            transition={{delay: focusedItemId ? 0.5 : 0, duration: 0.5, ease: "backInOut"}} 
-            animate={{scale: focusedItemId ? 1 : 0}} 
+            transition={{delay: activeItemId ? 0.5 : 0, duration: 0.5, ease: "backInOut"}} 
+            animate={{scale: activeItemId ? 1 : 0}} 
             onClick={closeItem}
             className="z-220 hidden relative top-12 left-16 h-10 w-10 bg-white border rounded-full"
             >
@@ -153,14 +163,14 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
           </motion.button>
         </div>
         <AnimatePresence>
-          {focusedItemId &&
+          {activeItemId &&
           (<>
           <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} className="z-200 md:order-first theme-card relative lg:w-1/4 pointer-events-auto flex flex-col">
-            <h3 className="text-3xl">{items[Number(focusedItemId)]?.title}</h3>
-            <p className="theme-sub mt-6">{items[Number(focusedItemId)]?.subtitle}</p>
-            <p className="theme-sub opacity-50 text-sm">{items[Number(focusedItemId)]?.date}</p>
-            <p className="hidden lg:block mt-8 text-sm">{items[Number(focusedItemId)]?.description}</p>
-            <button onClick={() => window.open(items[Number(focusedItemId)]?.link, "_blank")} className="self-end mt-8 px-4 py-2 border border-current theme-sub text-sm uppercase tracking-widest hover:bg-current/10 transition-colors">
+            <h3 className="text-3xl">{items[Number(activeItemId)]?.title}</h3>
+            <p className="theme-sub mt-6">{items[Number(activeItemId)]?.subtitle}</p>
+            <p className="theme-sub opacity-50 text-sm">{items[Number(activeItemId)]?.date}</p>
+            <p className="hidden lg:block mt-8 text-sm">{items[Number(activeItemId)]?.description}</p>
+            <button onClick={() => window.open(items[Number(activeItemId)]?.link, "_blank")} className="self-end mt-8 px-4 py-2 border border-current theme-sub text-sm uppercase tracking-widest hover:bg-current/10 transition-colors">
               View project
             </button>
           </motion.div>
