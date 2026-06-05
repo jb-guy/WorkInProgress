@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
 import { useSplitTransition, useTheme, type SplitMode, type Theme } from "../context/ThemeContext";
-import { transitionRef } from "../utils/transitionRef";
 
 export type SceneUpdate = {
   themeRight?: Theme;
@@ -20,6 +19,7 @@ export const useQueuedSceneUpdate = () => {
     setSplitMode,
     setSplitAngleDeg,
     setThemeRightOpacity,
+    setTransition,
   } = useSplitTransition();
 
   const rafRef = useRef<number | null>(null);
@@ -39,7 +39,7 @@ export const useQueuedSceneUpdate = () => {
       rafRef.current = null;
       const next = pendingUpdateRef.current;
       pendingUpdateRef.current = null;
-      if (!next || Date.now() - lastUpdateTimeRef.current < 16) return;
+      if (!next) return;
 
       lastUpdateTimeRef.current = Date.now();
       flushSync(() => {
@@ -59,8 +59,7 @@ export const useQueuedSceneUpdate = () => {
           setThemeRightOpacity(next.themeRightOpacity);
         }
         if (next.transition !== undefined && next.transition !== lastTransitionDetails.current?.transition) {
-          transitionRef.current = next.transition;
-          window.dispatchEvent(new CustomEvent("styleTransitionUpdate", { detail: { transition: next.transition } }));
+          setTransition(next.transition);
         }
       });
       lastTransitionDetails.current = { ...lastTransitionDetails.current, ...next };

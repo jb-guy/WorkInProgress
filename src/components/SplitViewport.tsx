@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { isDarkTheme, useSplitTransition, useTheme, type SplitMode, type Theme } from "../context/ThemeContext";
-import { transitionRef } from "../utils/transitionRef";
 import { NavControlsBar, NavStatusBadge, NavWindow, type SectionId } from "../sections/Nav";
 import Hero from "../sections/Hero";
 import About from "../sections/About";
@@ -73,7 +72,7 @@ function SplitHandle({
   lineRef: React.RefObject<HTMLDivElement | null>;
   dominantTheme: Theme;
 }) {
-  const { splitMode, splitAngleDeg } = useSplitTransition();
+  const { splitMode, splitAngleDeg, transitionRef } = useSplitTransition();
   const isDark = isDarkTheme(dominantTheme);
   const effectiveSplitX = Math.max(
     20,
@@ -132,7 +131,7 @@ export default function SplitViewport() {
   const [viewportWidth, setViewportWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
   const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 800);
   const { themeLeft, themeRight, devMode } = useTheme();
-  const { setTransition, splitMode, splitAngleDeg, themeRightOpacity } = useSplitTransition();
+  const { setTransition, splitMode, splitAngleDeg, themeRightOpacity,transitionRef } = useSplitTransition();
 
   const appRootRef = useRef<HTMLDivElement>(null);
   const outerLeftClipRef = useRef<HTMLDivElement>(null);
@@ -172,6 +171,7 @@ export default function SplitViewport() {
     };
 
     const onScroll = () => {
+      console.log("scroll");
       if (scrollRafRef.current !== null) return;
       scrollRafRef.current = window.requestAnimationFrame(applyScrollFrame);
     };
@@ -218,7 +218,7 @@ export default function SplitViewport() {
     if (!isDragging.current) return;
     if (splitMode === "horizontal") {
       const y = Math.max(40, Math.min(e.clientY, window.innerHeight - 40));
-      setTransition((window.innerHeight-y) / window.innerHeight);
+      setTransition((window.innerHeight - y) / window.innerHeight);
       return;
     }
     const x = Math.max(40, Math.min(e.clientX, window.innerWidth - 40));

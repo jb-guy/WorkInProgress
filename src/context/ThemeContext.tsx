@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useRef, useState, type ReactNode, type RefObject } from "react";
 
 export const THEMES = ["wireframe", "dark", "cybernoir", "holographic", "retro80"] as const;
 export type Theme = (typeof THEMES)[number];
@@ -16,7 +16,7 @@ interface ThemeContextValue {
 }
 
 interface SplitTransitionContextValue {
-  transition: number; // [0, 1]
+  transitionRef: RefObject<number>; // [0, 1]
   splitMode: SplitMode;
   splitAngleDeg: number;
   themeRightOpacity?: number; // only used in "overlaped" mode, [0, 1]
@@ -24,6 +24,7 @@ interface SplitTransitionContextValue {
   setSplitMode: (mode: SplitMode) => void;
   setSplitAngleDeg: (angle: number) => void;
   setThemeRightOpacity: (opacity: number) => void;
+  onTransitionUpdate?: (callback: ()=>{}) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
@@ -36,7 +37,7 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 const SplitTransitionContext = createContext<SplitTransitionContextValue>({
-  transition: 0.5,
+  transitionRef: { current: 0 },
   splitMode: "vertical",
   splitAngleDeg: 18,
   themeRightOpacity: 1,
@@ -44,12 +45,22 @@ const SplitTransitionContext = createContext<SplitTransitionContextValue>({
   setSplitMode: () => {},
   setSplitAngleDeg: () => {},
   setThemeRightOpacity: () => {},
+  onTransitionUpdate: () => {},
 });
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [themeLeft, setThemeLeft] = useState<Theme>("wireframe");
   const [themeRight, setThemeRight] = useState<Theme>("wireframe");
-  const [transition, setTransition] = useState(0);
+  const transitionRef = useRef(0);
+
+  const onTransitionUpdate = (callback: ()=>{}) => {
+    window.addEventListener("styleTransitionUpdate", callback);
+  }
+
+  const setTransition = (x: number) => {
+    transitionRef.current = x;
+    window.dispatchEvent(new CustomEvent("styleTransitionUpdate", { detail: { transition: x } }));
+  }
   const [splitMode, setSplitMode] = useState<SplitMode>("horizontal");
   const [splitAngleDeg, setSplitAngleDeg] = useState(18);
   const [themeRightOpacity, setThemeRightOpacity] = useState(1);
@@ -68,7 +79,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     >
       <SplitTransitionContext.Provider
         value={{
-          transition,
+          transitionRef: transitionRef,
           splitMode,
           splitAngleDeg,
           themeRightOpacity,
@@ -76,6 +87,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
           setSplitMode,
           setSplitAngleDeg,
           setThemeRightOpacity,
+          onTransitionUpdate,
         }}
       >
         {children}
