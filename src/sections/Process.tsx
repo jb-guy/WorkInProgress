@@ -3,7 +3,6 @@ import { useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
 import KoiCatScene from "../three/KoiCatScene";
-import WindowFluidGlass from "../three/WindowFluidGlass";
 import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 const items = [

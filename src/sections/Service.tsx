@@ -18,6 +18,9 @@ const serviceOuterImageByTheme: Record<Theme, string> = {
   retro80: toSvgDataUri(
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='1200' height='800' fill='#241b2f'/><g fill='#ff6ec7' opacity='0.5'><rect x='90' y='130' width='300' height='180' rx='18'/><rect x='430' y='230' width='360' height='220' rx='18'/><rect x='820' y='130' width='280' height='160' rx='18'/></g><g fill='#5af2ff' opacity='0.35'><rect x='70' y='500' width='1060' height='120' rx='24'/></g></svg>`
   ),
+  dreamscape: toSvgDataUri(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='1200' height='800' fill='#fdf6f0'/><g fill='#94a3b8'><rect x='90' y='130' width='300' height='180' rx='18'/><rect x='430' y='230' width='360' height='220' rx='18'/><rect x='820' y='130' width='280' height='160' rx='18'/></g></svg>`
+  ),
 };
 
 const serviceInnerImageByTheme: Record<Theme, string> = {
@@ -35,6 +38,9 @@ const serviceInnerImageByTheme: Record<Theme, string> = {
   ),
   retro80: toSvgDataUri(
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 380'><rect width='640' height='380' fill='#1d1630'/><rect x='24' y='24' width='592' height='332' rx='16' fill='#2a1f46'/><rect x='68' y='90' width='220' height='18' rx='9' fill='#ff6ec7'/><rect x='68' y='126' width='170' height='14' rx='7' fill='#5af2ff'/><circle cx='470' cy='190' r='84' fill='#f9a8ff'/></svg>`
+  ),
+  dreamscape: toSvgDataUri(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 380'><rect width='640' height='380' fill='#fdf6f0'/><rect x='24' y='24' width='592' height='332' rx='16' fill='#e2e8f0'/><rect x='68' y='90' width='220' height='18' rx='9' fill='#94a3b8'/><rect x='68' y='126' width='170' height='14' rx='7' fill='#64748b'/><circle cx='470' cy='190' r='84' fill='#cbd5e1'/></svg>`
   ),
 };
 
