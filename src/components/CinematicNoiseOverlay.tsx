@@ -141,7 +141,7 @@ export default function CinematicNoiseOverlay({
     };
 
     resizeCanvas();
-    console.log("Starting cinematic noise overlay with target FPS:", fps);
+    //console.log("Starting cinematic noise overlay with target FPS:", fps);
     rafId = window.requestAnimationFrame(render);
     window.addEventListener("resize", resizeCanvas);
 

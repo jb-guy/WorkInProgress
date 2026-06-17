@@ -65,7 +65,8 @@ const SceneByTheme = ({ theme, resolution, mousePos }: { theme: Theme, resolutio
 };
 
 const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play: boolean, mouseReact?: boolean }) => {
-  if(theme === "cybernoir") return (
+  if(theme === "cybernoir") return null;
+  (
     <Hyperspeed
       effectOptions={{
         "distortion":"turbulentDistortion",

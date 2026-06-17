@@ -26,7 +26,7 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!right) return;
     queueSceneUpdate({
-      themeLeft: "cybernoir",
+      themeLeft: "dreamscape",
       themeRight: "wireframe",
       splitMode: "circle",
       transition: latest,

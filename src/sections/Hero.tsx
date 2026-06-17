@@ -20,7 +20,6 @@ const HeroOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) =
 )};
 
 const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) => {
-  const { setThemeRight, setThemeLeft } = useTheme();
   const queueSceneUpdate = useQueuedSceneUpdate();
 
   const handleCta = () => {
@@ -38,10 +37,10 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
         queueSceneUpdate({ transition: value });
       },
       onComplete() {
-        setThemeLeft("holographic");
+        queueSceneUpdate({themeLeft: "holographic" });
       }
     });
-  }, [queueSceneUpdate, setThemeLeft]);
+  }, [queueSceneUpdate]);
       
 
   return (

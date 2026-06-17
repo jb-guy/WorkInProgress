@@ -2,7 +2,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Theme } from "../context/ThemeContext";
-import { Billboard, Html, PerspectiveCamera, TrackballControls } from "@react-three/drei";
+import { Billboard, Html, Image, PerspectiveCamera, TrackballControls } from "@react-three/drei";
 import { animate } from "motion";
 import { motion } from "motion/react";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
@@ -16,44 +16,16 @@ interface Item {
   description: string;
 }
 
-const ItemCard = ({ item, visible }: { item: Item; visible: boolean }) => {
-  const { activeItemId } = useSectionInteraction("work");
+const ItemCard = ({ item }: { item: Item; visible?: boolean }) => {
+  //const { activeItemId } = useSectionInteraction("work");
 
   return (
-    <Html
-      transform
-      style={{ opacity: visible ? 1 : 0.3 }}
-      zIndexRange={[100, 0]}
-      distanceFactor={15}
-    >
-      <motion.div transition={{duration:activeItemId ? 1.0 : 0.5, ease: "backInOut"}} animate={{scale: activeItemId ? 0.2 : 1}} className="flex flex-col items-center pointer-events-none select-none">
-        <img src={item.image} alt={item.title} className="w-24 h-24 object-cover mb-2 rounded-full transition-all delay-300" />
-        <motion.img transition={{duration: 0.5, ease: "backInOut"}} animate={{opacity: activeItemId === item.id ? 0 : 1}} src={item.image} alt={item.title} className="absolute w-24 h-24 object-cover rounded-full grayscale" />
-      </motion.div>
-    </Html>
+    <Image url={item.image}/>
   )
 };
 
 const ItemBillboard = ({ item, normal, scale }: { item: Item; normal: THREE.Vector3; scale: number }) => {
   const billboardRef = useRef<THREE.Group>(null);
-  const [visible, setVisible] = useState(true);
-  const frameCounterRef = useRef(0);
-  const lastVisibleRef = useRef(true);
-  const worldPos = useMemo(() => new THREE.Vector3(), []);
-  const cameraDir = useMemo(() => new THREE.Vector3(), []);
-
-  useFrame(({ camera }) => {
-    frameCounterRef.current += 1;
-    if (frameCounterRef.current % 3 !== 0) return;
-    if (!billboardRef.current) return;
-
-    worldPos.setFromMatrixPosition(billboardRef.current.matrixWorld).normalize();
-    cameraDir.copy(camera.position).normalize();
-    const nextVisible = worldPos.dot(cameraDir) > 0.06;
-    if (nextVisible === lastVisibleRef.current) return;
-    lastVisibleRef.current = nextVisible;
-    setVisible(nextVisible);
-  });
 
   return (
     <Billboard
@@ -64,7 +36,7 @@ const ItemBillboard = ({ item, normal, scale }: { item: Item; normal: THREE.Vect
       lockZ={false}
       onUpdate={(self) => self.lookAt(normal.clone().multiplyScalar(100))}
     >
-      <ItemCard item={item} visible={visible} />
+      <ItemCard item={item}/>
     </Billboard>
   );
 };
@@ -267,7 +239,7 @@ const SphereScene = ({ size, items, className }: { size: number, items: Item[], 
   )
 };
 
-export default ({ size, items, className }: { size: number, items: Item[], className?: string }) => {
+export default memo(({ size, items, className }: { size: number, items: Item[], className?: string }) => {
   const maxDpr = useMemo(() => {
     if (typeof window === "undefined") return 1.25;
     return window.innerWidth < 768 ? 1.15 : 1.25;
@@ -283,4 +255,4 @@ export default ({ size, items, className }: { size: number, items: Item[], class
       </Canvas>
     </div>
   )
-};
+});

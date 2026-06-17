@@ -1,6 +1,6 @@
 import { createContext, useContext, useRef, useState, type ReactNode, type RefObject } from "react";
 
-export const THEMES = ["wireframe", "dark", "cybernoir", "holographic", "retro80"] as const;
+export const THEMES = ["wireframe", "dark", "cybernoir", "holographic", "retro80", "dreamscape"] as const;
 export type Theme = (typeof THEMES)[number];
 export const isDarkTheme = (theme: Theme) => theme === "dark" || theme === "cybernoir" || theme === "holographic";
 export const SPLIT_MODES = ["vertical", "horizontal", "angled", "overlaped", "clip", "circle", "square"] as const;

@@ -5,6 +5,7 @@ import ShaderBackground, { preloadTextures } from "../three/ShaderBackground"
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll } from "motion/react";
 import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
+import Carousel from "../components/Carousel";
 
 const toSvgDataUri = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 const WORK_SECTION_ID = "work";
@@ -53,7 +54,7 @@ const items = [
 ];
 
 const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
-  const { focusedItemId, activeItemId } = useSectionInteraction(WORK_SECTION_ID);
+  const { details, setDetails, focusedItemId, activeItemId } = useSectionInteraction(WORK_SECTION_ID);
   const container = useRef<HTMLDivElement>(null);
   const isInView = useInView(container);
 
@@ -62,22 +63,27 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
     return items.find(item => item.id === (activeItemId ?? focusedItemId))?.background;
   }, [focusedItemId, activeItemId]);
 
+  useEffect(() => {
+    if (!right ) {
+      setDetails(isInView ? "inView" : "notInView");
+    }
+  }, [isInView]);
+
   const progress = useMemo(() => {
-    if (activeItemId && isInView) return 0.75;   // fully confirmed
-    if (focusedItemId && isInView) return 0.25;  // preview on press
+    if (activeItemId && details === "inView") return 0.75;   // fully confirmed
     return 0.1;
-  }, [focusedItemId, activeItemId, isInView]);
+  }, [focusedItemId, activeItemId, details]);
 
   return (
-    <div className="work-theme z-10 theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center">
+    <div className="work-theme z-10 theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center overflow-visible">
       <div className="absolute w-[55vh] h-[55vh] top-[25vh] lg:top-[35vh]">
         <div ref={container} className="absolute inset-16 lg:inset-12 theme-border rounded-full"/>
       </div>
-      <div className="absolute h-[100vw] w-[100vh] top-[-27.5vw] lg:top-[-20.5vw] min-w-screen min-h-screen">
+      <div className="h-[100vw] w-[100vh] min-w-screen min-h-screen top-[-27.5vh] lg:top-[-20.5vh] overflow-visible">
         {theme === "cybernoir" && (
-          <img src="/cyberworkbg.png" alt="cybernoir theme overlay" className="size-full scale-100 lg:scale-150 xl:scale-150 lg:top-0 object-none object-[50%_55%] lg:object-[50%_40%] pointer-events-none" />
+          <img src="/cyberworkbg.png" alt="cybernoir theme overlay" className="absolute size-full scale-120 -top-60 left-1 lg:-top-11 object-none object-[50%_44%] lg:object-[50%_60%] pointer-events-none" />
         )}
-        <ShaderBackground image={displayImage} progress={progress} />
+        <ShaderBackground image={displayImage} progress={progress} className="-mt-15 lg:mt-25" />
       </div>
     </div>
   );
@@ -134,39 +140,17 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
       <h2 className="theme-title w-full ml-4 sm:ml-8 pt-4 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-7xl">
         Selected work
       </h2>
-      {showHint && (
-        <motion.p
-          animate={{ opacity: [0.5, 1, 0.5], y: 0, transition: { duration: 1, ease: "easeInOut", repeat: showHint ? Infinity : 0 } }}
-          exit={{ opacity: 0, y: 20 }}
-          className="theme-sub inset-0 mx-auto mt-10 lg:mt-20 text-xl lg:text-3xl"
-        >
-          Grab the project sphere and explore
-        </motion.p>
-      )}
       <div className="absolute top-[30vh] lg:top-[35vh] h-[55vh] w-full flex flex-col lg:flex-row justify-between">
-        <div className="theme-border grow min-h-[45vh] flex flex-col items-center">
-          <div 
-            className="absolute -mt-52 lg:-mt-50 h-screen w-screen">
-            <SphereMenu size={window.innerWidth < 768 ? 0.5 : 0.6} items={items}/>
+          <div className="theme-border lg:grow min-h-[45vh] flex flex-col justify-center items-center">
+            <p className="absolute -top-8.5 self-start lg:self-center theme-sub theme-bg opacity-0 wireframe:opacity-100 text-xs p-2 theme-border w-fit">Project Viewer</p>
+            <div className="flex">
+              <Carousel baseWidth={300} items={items} round loop />
+            </div>
           </div>
-          <div className="z-200 absolute w-screen h-[27.5vh] lg:h-[22.5vh] top-[-27.5vh] lg:top-[-22.5vh] " />
-          <div className="z-200 absolute w-screen h-[27.5vh] lg:h-[22.5vh] bottom-[-17.5vh] lg:bottom-[-22.5vh] " />
-
-          <p className="relative -top-8.5 self-start lg:self-center theme-sub theme-bg opacity-0 wireframe:opacity-100 text-xs p-2 theme-border w-fit">Project Viewer</p>
-          <motion.button 
-            transition={{delay: activeItemId ? 0.5 : 0, duration: 0.5, ease: "backInOut"}} 
-            animate={{scale: activeItemId ? 1 : 0}} 
-            onClick={closeItem}
-            className="z-220 hidden relative top-12 left-16 h-10 w-10 bg-white border rounded-full"
-            >
-            <div className="absolute inset-x-1 inset-y-4.5 border rotate-45 origin-center"/>
-            <div className="absolute inset-x-1 inset-y-4.5 border -rotate-45 origin-center"/>
-          </motion.button>
-        </div>
-        <AnimatePresence>
+      <AnimatePresence>
           {activeItemId &&
           (<>
-            <motion.div key="modal" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{opacity:0, x: -100}} className="z-200 md:order-first theme-card relative lg:w-1/4 pointer-events-auto flex flex-col">
+            <motion.div key="modal" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{opacity:0, x: -100}} className="z-200 lg:order-first theme-card relative lg:w-1/4 pointer-events-auto flex flex-col">
               <h3 className="text-3xl">{items[Number(activeItemId)]?.title}</h3>
               <p className="theme-sub mt-6">{items[Number(activeItemId)]?.subtitle}</p>
               <p className="theme-sub opacity-50 text-sm">{items[Number(activeItemId)]?.date}</p>
@@ -179,7 +163,7 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
               <h3 className="text-3xl">Stack used</h3>
             </motion.div>
           </>)}
-        </AnimatePresence>
+      </AnimatePresence>
       </div>
       <div className="w-full h-0 theme-border" />
     </div>

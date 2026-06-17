@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import type { SectionId } from "../sections/Nav";
 
-type ItemId = string | null;
+type ItemId = string| number | null;
 
 type SectionInteractionState = {
   interaction: string| null; // e.g. "hover", "active", "focus"

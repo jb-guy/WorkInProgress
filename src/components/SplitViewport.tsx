@@ -171,7 +171,6 @@ export default function SplitViewport() {
     };
 
     const onScroll = () => {
-      console.log("scroll");
       if (scrollRafRef.current !== null) return;
       scrollRafRef.current = window.requestAnimationFrame(applyScrollFrame);
     };

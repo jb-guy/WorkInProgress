@@ -2,6 +2,9 @@ import { use, useState, useRef } from "react";
 import { useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
+import KoiCatScene from "../three/KoiCatScene";
+import WindowFluidGlass from "../three/WindowFluidGlass";
+import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 const items = [
   {
@@ -54,10 +57,31 @@ const ProcessOuterContent = ({ theme }: { theme: Theme }) => (
   </div>
 );
 
-const ProcessInnerContent = ({ theme }: { theme: Theme }) => {
+const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { activeItemId, setActiveItemId } = useSectionInteraction("process");
   const step = activeItemId ? items.findIndex(item => item.id === activeItemId) : 0;
+
+    const queueSceneUpdate = useQueuedSceneUpdate();
+    const { scrollYProgress } = useScroll({
+      target: sectionRef,
+      offset: ["60% end", "80% end"],
+    });
+  
+    useMotionValueEvent(scrollYProgress, "animationStart", () => {
+      if (right) return;
+      queueSceneUpdate({ transition: 1 });
+    });
+  
+    useMotionValueEvent(scrollYProgress, "change", (latest) => {
+      if (right) return;
+      queueSceneUpdate({
+        themeLeft: "cybernoir",
+        themeRight: "dreamscape",
+        splitMode: "angled",
+        transition: latest,
+      });
+    });
 
   return (
   <div ref={sectionRef} className="process-theme relative flex h-screen w-full flex-col py-15 lg:py-30">
@@ -71,17 +95,15 @@ const ProcessInnerContent = ({ theme }: { theme: Theme }) => {
     
     <div className="h-full w-full grid grid-cols-[auto_5rem] lg:grid-cols-[35%_65%] grid-rows-[auto_1fr] ">
       <div className="lg:h-10 order-2 lg:order-0 lg:col-span-2 p-2 lg:px-24 text-xs lg:text-base flex flex-col lg:flex-row justify-around items-center">
-        <button className="text-sub" onClick={() => setActiveItemId("1")}> 01 </button>
-        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
-        <button className="text-sub" onClick={() => setActiveItemId("2")}> 02 </button>
-        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
-        <button className="text-sub" onClick={() => setActiveItemId("3")}> 03 </button>
-        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
-        <button className="text-sub" onClick={() => setActiveItemId("4")}> 04 </button>
-        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
-        <button className="text-sub" onClick={() => setActiveItemId("5")}> 05 </button>
-        <span className="text-xs hidden wireframe:flex lg:-rotate-90 opacity-50">&#8595;</span>
-        <button className="text-sub" onClick={() => setActiveItemId("6")}> 06 </button>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            className="text-sub"
+            onClick={() => setActiveItemId(item.id)}
+          >
+            {item.title}
+          </button>
+        ))}
       </div>
 
       <div className="h-full theme-card flex flex-col justify-center text-left">
@@ -95,7 +117,9 @@ const ProcessInnerContent = ({ theme }: { theme: Theme }) => {
           {items[step].description}
         </p>
       </div>
-      <div className="h-full order-2 col-span-2 lg:col-span-1 theme-spacer theme-card" />
+      <div className="h-full order-2 col-span-2 lg:col-span-1 theme-spacer theme-card">
+        {theme === "dreamscape" && <KoiCatScene step={step} />}
+      </div>
     </div>
   </div>
 )};
@@ -110,3 +134,4 @@ const ProcessInner = ({ theme }: SectionThemeProps) => <ProcessInnerContent them
 
 const Process = { Outer: ProcessOuter, Inner: ProcessInner };
 export default Process;
+

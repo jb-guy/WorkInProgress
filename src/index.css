@@ -6,6 +6,7 @@
 @custom-variant cybernoir (&:where([data-theme="cybernoir"] *));
 @custom-variant holographic (&:where([data-theme="holographic"] *));
 @custom-variant retro80 (&:where([data-theme="retro80"] *));
+@custom-variant dreamscape (&:where([data-theme="dreamscape"] *));
 
 /* ── Base resets ── */
 * { box-sizing: border-box; }
@@ -33,3 +34,4 @@ html, body { margin: 0; padding: 0; }
     @import "./css/themes/cybernoir.css";
     @import "./css/themes/holographic.css";
     @import "./css/themes/retro80.css";
+    @import "./css/themes/dreamscape.css";
