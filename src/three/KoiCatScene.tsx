@@ -43,6 +43,7 @@ const KoiCatModel = ({step}: Props) => {
     };
   }, [mixer]);
 
+  const all = result.scene.getObjectByName("All")!;
   const cat = result.scene.getObjectByName("Cat")!;
   cat.scale.set(0.01, 0.01, 0.01);
   const fishes = result.scene.getObjectByName("Fishes")!;
@@ -84,7 +85,10 @@ const KoiCatModel = ({step}: Props) => {
        animate(decoration.scale, { x: 0.01, y: 0.01, z: 0.01 }, { duration: 0.1 });
        animate(environment.scale, { x: 0.01, y: 0.01, z: 0.01 }, { duration: 0.1 });
     }
-     animate(camera.position, cameraPositions[step], { duration: 0.5 });
+    if (step == 5) {
+      animate(all.rotation, { y: all.rotation.y + Math.PI * 2 }, { duration: 1, ease: "anticipate" });
+    }
+     animate(camera.position, cameraPositions[step], { duration: 0.5, ease: "circInOut" });
     animate(lookAt, lookAtPositions[step], { duration: 0.5 });
 
   }, [step]);

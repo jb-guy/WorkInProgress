@@ -21,7 +21,6 @@
   --theme-sub-color: #c919c3;
 
   --theme-card-bg: var(--dark);
-  --theme-card-border: double 1em transparent;
   --theme-card-border-radius: 2rem;
   --theme-card-border-width: 0px;
   --theme-card-background-image: linear-gradient(white,white), linear-gradient(45deg, #ff60ff, #00ffff, #ff80ff, #00ffff);

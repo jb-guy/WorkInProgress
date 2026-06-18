@@ -51,10 +51,17 @@ const items = [
 ];
 
 
-const ProcessOuterContent = ({ theme }: { theme: Theme }) => (
+const ProcessOuterContent = ({ theme }: { theme: Theme }) => {
+  const {activeItemId} = useSectionInteraction("process");
+  const step = activeItemId ? items.findIndex(item => item.id === activeItemId) : 0;
+
+  return (
   <div className="process-theme theme-bg relative h-screen w-full overflow-hidden">
+    <div className="absolute inset-0 lg:translate-x-2/10 lg:translate-y-1/10">
+      {theme === "dreamscape" && <KoiCatScene step={step} />}
+    </div>
   </div>
-);
+)};
 
 const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -84,40 +91,40 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
 
   return (
   <div ref={sectionRef} className="process-theme relative flex h-screen w-full flex-col py-15 lg:py-30">
-    <p className="theme-sub mb-2 ml-4 font-mono text-xs uppercase tracking-widest">
+    <p className="theme-sub mb-2 lg:ml-4 font-mono text-xs uppercase tracking-widest">
       03 — Process
     </p>
-    <div className="w-full h-0 theme-border"/>
-    <h2 className="theme-title ml-4 sm:ml-8 pt-4 mb-10 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-7xl">
+    <div className="w-full h-0 theme-border border-b-0!"/>
+    <h2 className="theme-title pt-4 mb-6 lg:ml-10 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-5xl">
       Development Process
     </h2>
-    
-    <div className="h-full w-full grid grid-cols-[auto_5rem] lg:grid-cols-[35%_65%] grid-rows-[auto_1fr] ">
-      <div className="lg:h-10 order-2 lg:order-0 lg:col-span-2 p-2 lg:px-24 text-xs lg:text-base flex flex-col lg:flex-row justify-around items-center">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            className="text-sub"
-            onClick={() => setActiveItemId(item.id)}
-          >
-            {item.title}
-          </button>
-        ))}
-      </div>
 
-      <div className="h-full theme-card flex flex-col justify-center text-left">
-        <h3 className="theme-title text-3xl font-bold leading-none tracking-tight lg:text-5xl">
-          {items[step].title}
-        </h3>
-        <p className="theme-sub mt-6 max-w-xl text-sm">
-          {items[step].keyPhrase}
-        </p>
-        <p className="theme-sub mt-2 max-w-xl text-sm">
-          {items[step].description}
-        </p>
-      </div>
-      <div className="h-full order-2 col-span-2 lg:col-span-1 theme-spacer theme-card">
-        {theme === "dreamscape" && <KoiCatScene step={step} />}
+    <div className="lg:h-16 lg:gap-4 p-2 lg:ml-4 mb-6 flex justify-around lg:justify-start ">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          className="size-12 text-sub rounded-full! lg:rounded-xl! text-xs max-w-32"
+          onClick={() => setActiveItemId(item.id)}
+        >
+          {window.innerWidth >= 1024 ? item.title : `0${item.id}`}
+        </button>
+      ))}
+    </div>
+    
+    <div className="h-full w-full">
+      <div className="h-full w-full flex flex-col lg:flex-row">
+        <div className=" h-80 lg:h-full lg:grow theme-spacer"/>
+        <div className="lg:order-first lg:w-7/20 theme-card flex flex-col justify-center text-left">
+          <h3 className="theme-title mx-5 text-3xl font-bold leading-none tracking-tight lg:text-5xl">
+            {items[step].title}
+          </h3>
+          <p className="theme-sub mx-5 mt-4 max-w-xl text-sm">
+            {items[step].keyPhrase}
+          </p>
+          <p className="theme-text mx-5 mt-10 max-w-xl text-sm">
+            {items[step].description}
+          </p>
+        </div>
       </div>
     </div>
   </div>

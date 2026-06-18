@@ -18,36 +18,37 @@
   --theme-text-font: "Inter", "Segoe UI", sans-serif;
   --theme-sub-color: var(--primary-color);
 
-  --theme-card-bg: var(--darker-color);
-  --theme-card-border-radius: 0px;
-  --theme-card-padding: 2rem;
-  --theme-card-margin: 0rem;
+  --theme-card-bg: color-mix(in srgb, var(--darker-color) 50%, #00000050 50%);
+  --theme-card-border: 1px solid color-mix(in srgb, var(--muted-color) 80%, transparent 20%);;
+  --theme-card-border-radius: 2em;
+  --theme-card-padding: 1rem;
+  --theme-card-margin: 1rem;
   --theme-card-text-color: var(--light);
 
-  --theme-button-bg: #ffffff50;
+  --theme-button-bg: color-mix(in srgb, var(--darker-color) 50%, #00000050 50%);
   --theme-button-border-radius: 9px;
-  --theme-button-text: #111111;
-  --theme-button-font: "IBM Plex Mono", "SFMono-Regular", monospace;
+  --theme-button-border: 1px solid var(--light);
+  --theme-button-text: var(--light);
   --theme-button-transform: uppercase;
-  --theme-button-letter-spacing: 0.1em;
+  --theme-button-padding: 0.5rem 1rem;
 }
 
-[data-theme="dreamscape"] button{
-  position: relative;
-  overflow: hidden;
+[data-theme="dreamscape"] .theme-card, [data-theme="dreamscape"] button {
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="dreamscape"] .theme-card{
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 0 20px 10px rgba(255, 255, 255, 1);
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    inset 0 0 40px 10px rgba(0, 0, 0, 0.2);
 }
 
-[data-theme="dreamscape"] button::before {
+[data-theme="dreamscape"] .theme-card::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   height: 1px;
   width: 100%;
-  background: linear-gradient(90deg, #ffffff00, #ffffffff, #ffffff00);
+  background: linear-gradient(90deg, #ffffff00, #ffffff99, #ffffff00);
 }

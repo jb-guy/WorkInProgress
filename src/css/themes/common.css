@@ -30,23 +30,31 @@
   background-origin: var(--theme-card-background-origin, none);
   background-clip: var(--theme-card-background-clip, none);
   color: var(--theme-card-text-color, inherit);
-  border: var(--theme-card-border, none);
   border-color: var(--theme-card-border-color, none);
   border-image: var(--theme-card-border-image, none);
   border-width: var(--theme-card-border-width, inherit);
   border-style: var(--theme-card-border-style, inherit);
+  border: var(--theme-card-border, none);
   border-radius: var(--theme-card-border-radius, none);
   padding: var(--theme-card-padding, 2rem);
   margin: var(--theme-card-margin, 0rem);
   pointer-events: auto;
 }
 
+@media (max-width: 1024px) {
+ .theme-card {
+    padding: var(--theme-card-padding, 1rem);
+    margin: var(--theme-card-margin, 0rem);
+  }
+}
+
 button {
+  position: relative;
   cursor: pointer;
   pointer-events: auto;
   border: var(--theme-button-border, none);
   background: var(--theme-button-bg, transparent);
-  border-radius: var(--theme-button-border-radius, 0);
+  border-radius: var(--theme-button-border-radius, inherit);
   padding: var(--theme-button-padding, 0.5rem 1rem);
   color: var(--theme-button-text, inherit);
   font-family: var(--theme-button-font, inherit);

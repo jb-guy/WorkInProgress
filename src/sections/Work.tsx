@@ -159,7 +159,7 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
                 View project
               </button>
             </motion.div>
-            <motion.div initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} className="z-200 hidden lg:block theme-card w-1/4 pointer-events-auto text-right">
+            <motion.div key="stack" initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }} className="z-200 hidden lg:block theme-card w-1/4 pointer-events-auto text-right">
               <h3 className="text-3xl">Stack used</h3>
             </motion.div>
           </>)}
