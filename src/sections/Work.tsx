@@ -119,10 +119,10 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!right) return;
     queueSceneUpdate({
-      themeLeft: "retro80",
-      themeRight: "cybernoir",
+      themeLeft: "cybernoir",
+      themeRight: "retro80",
       splitMode: "square",
-      transition: latest,
+      transition: (1-latest),
     });
   });
 

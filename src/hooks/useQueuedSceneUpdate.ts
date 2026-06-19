@@ -14,7 +14,7 @@ export type SceneUpdate = {
 const lastTransitionDetails = {current: null as SceneUpdate | null};
 
 export const useQueuedSceneUpdate = () => {
-  const { devMode, setThemeRight, setThemeLeft } = useTheme();
+  const { devMode, setThemeRight, setThemeLeft, dominantTheme, setDominantTheme } = useTheme();
   const {
     setSplitMode,
     setSplitAngleDeg,
@@ -25,6 +25,7 @@ export const useQueuedSceneUpdate = () => {
   const rafRef = useRef<number | null>(null);
   const pendingUpdateRef = useRef<SceneUpdate | null>(null);
   const lastUpdateTimeRef = useRef<number>(0);
+  const lastDominantThemeRef = useRef<string>("left");
 
   const queueSceneUpdate = useCallback((update: SceneUpdate) => {
     if (devMode) return;
@@ -34,7 +35,6 @@ export const useQueuedSceneUpdate = () => {
     };
 
     if (rafRef.current !== null) return;
-
     rafRef.current = window.requestAnimationFrame(() => {
       rafRef.current = null;
       const next = pendingUpdateRef.current;
@@ -60,11 +60,16 @@ export const useQueuedSceneUpdate = () => {
         }
         if (next.transition !== undefined && next.transition !== lastTransitionDetails.current?.transition) {
           setTransition(next.transition);
+          if (next.transition < 0.5 && lastDominantThemeRef.current !== dominantTheme) {
+            setDominantTheme(next.themeLeft || lastTransitionDetails.current?.themeLeft || dominantTheme);
+          } else if (next.transition >= 0.5 && lastDominantThemeRef.current !== dominantTheme) {
+            setDominantTheme(next.themeRight || lastTransitionDetails.current?.themeRight || dominantTheme);
+          }
         }
       });
       lastTransitionDetails.current = { ...lastTransitionDetails.current, ...next };
     });
-  }, [devMode, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity]);
+  }, [devMode, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
 
   /*useEffect(() => {
     return () => {

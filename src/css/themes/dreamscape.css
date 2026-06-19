@@ -33,10 +33,6 @@
   --theme-button-padding: 0.5rem 1rem;
 }
 
-[data-theme="dreamscape"] .theme-card, [data-theme="dreamscape"] button {
-  backdrop-filter: blur(10px);
-}
-
 [data-theme="dreamscape"] .theme-card{
   box-shadow:
     0 8px 16px rgba(0, 0, 0, 0.2),

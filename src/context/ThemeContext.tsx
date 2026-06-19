@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, type ReactNode, type RefObject } from "react";
+import { createContext, useCallback, useContext, useRef, useState, type ReactNode, type RefObject } from "react";
 
 export const THEMES = ["wireframe", "dark", "cybernoir", "holographic", "retro80", "dreamscape"] as const;
 export type Theme = (typeof THEMES)[number];
@@ -10,6 +10,8 @@ interface ThemeContextValue {
   themeLeft: Theme;
   themeRight: Theme;
   devMode?: boolean;
+  dominantTheme: Theme;
+  setDominantTheme: (theme: Theme) => void;
   setThemeLeft: (t: Theme) => void;
   setThemeRight: (t: Theme) => void;
   setDevMode: (dev: boolean) => void;
@@ -30,9 +32,11 @@ interface SplitTransitionContextValue {
 const ThemeContext = createContext<ThemeContextValue>({
   themeLeft: "dark",
   themeRight: "wireframe",
+  dominantTheme: "dark",
   devMode: false,
   setThemeLeft: () => {},
   setThemeRight: () => {},
+  setDominantTheme: () => {},
   setDevMode: () => {},
 });
 
@@ -51,19 +55,21 @@ const SplitTransitionContext = createContext<SplitTransitionContextValue>({
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [themeLeft, setThemeLeft] = useState<Theme>("wireframe");
   const [themeRight, setThemeRight] = useState<Theme>("wireframe");
+  const [dominantTheme, setDominantTheme] = useState<Theme>("wireframe");
   const transitionRef = useRef(0);
 
   const onTransitionUpdate = (callback: ()=>{}) => {
     window.addEventListener("styleTransitionUpdate", callback);
   }
 
-  const setTransition = (x: number) => {
+  const setTransition = useCallback((x: number) => {
     transitionRef.current = x;
     window.dispatchEvent(new CustomEvent("styleTransitionUpdate", { detail: { transition: x } }));
-  }
-  const [splitMode, setSplitMode] = useState<SplitMode>("horizontal");
+  }, []);
+
+  const [splitMode, setSplitMode] = useState<SplitMode>("overlaped");
   const [splitAngleDeg, setSplitAngleDeg] = useState(18);
-  const [themeRightOpacity, setThemeRightOpacity] = useState(1);
+  const [themeRightOpacity, setThemeRightOpacity] = useState(0);
   const [devMode, setDevMode] = useState(false);
 
   return (
@@ -71,10 +77,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       value={{
         themeLeft,
         themeRight,
+        dominantTheme,
         devMode,
         setThemeLeft,
         setThemeRight,
         setDevMode,
+        setDominantTheme,
       }}
     >
       <SplitTransitionContext.Provider

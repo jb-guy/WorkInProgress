@@ -130,7 +130,7 @@ export default function SplitViewport() {
   const [activeSection, setActiveSection] = useState<SectionId>("hero");
   const [viewportWidth, setViewportWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
   const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 800);
-  const { themeLeft, themeRight, devMode } = useTheme();
+  const { themeLeft, themeRight, dominantTheme, devMode } = useTheme();
   const { setTransition, splitMode, splitAngleDeg, themeRightOpacity,transitionRef } = useSplitTransition();
 
   const appRootRef = useRef<HTMLDivElement>(null);
@@ -241,8 +241,6 @@ export default function SplitViewport() {
     window.addEventListener("pointerup", onPointerUp);
   }, [onPointerMove, onPointerUp, splitMode]);
 
-  const dominantTheme: Theme = transitionRef.current <= 0.5 ? themeLeft : themeRight;
-
   const outerLeftSections = useMemo(() => SECTIONS.map((section) => (
     <div key={`outer-left-${section.id}`} className="w-full">
       <section.Outer theme={themeLeft} />
@@ -266,6 +264,14 @@ export default function SplitViewport() {
       <section.Inner theme={themeRight} right />
     </div>
   )), [themeRight]);
+
+  const spacerElement = useMemo(() => (
+    <div className="relative -z-1000">
+      {SECTIONS.map((section, index) => (
+        <div key={section.id} ref={(element) => { outerRefs.current[index] = element; }} className="h-screen" />
+      ))}
+    </div>
+  ), []);
 
   return (
     <div ref={appRootRef} className="relative" style={{ "--scroll-y": "0px" } as React.CSSProperties}>
@@ -312,11 +318,7 @@ export default function SplitViewport() {
         </div>
       </div>
 
-      <div className="relative -z-1000">
-        {SECTIONS.map((section, index) => (
-          <div key={section.id} ref={(element) => { outerRefs.current[index] = element; }} className="h-screen" />
-        ))}
-      </div>
+      {spacerElement}
 
       {devMode && (
         <SplitHandle

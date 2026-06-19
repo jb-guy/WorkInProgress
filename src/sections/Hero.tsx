@@ -40,7 +40,7 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
         queueSceneUpdate({themeLeft: "holographic" });
       }
     });
-  }, [queueSceneUpdate]);
+  }, []);
       
 
   return (

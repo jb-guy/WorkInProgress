@@ -177,31 +177,3 @@ export const NavWindow = ({ children, dominantTheme }: NavWindowProps) => {
     </div>
   );
 };
-
-const Nav = (props: Props) => {
-  const { themeLeft } = useTheme();
-  const activeLabel = props.activeSection ? SECTION_LABELS[props.activeSection] : "HERO";
-  const dominantTheme = props.dominantTheme ?? themeLeft;
-  const { frameClass, separatorClass, subtleClass } = getPalette(dominantTheme);
-
-  return (
-    <div className="h-0 w-full fixed z-100 top-0 left-0">
-      <div className="h-screen p-2 lg:p-10 pointer-events-none">
-        <div className={`h-full w-full border rounded-xl lg:rounded-2xl overflow-hidden pointer-events-none ${frameClass} transition-colors`}>
-          <NavControlsBar dominantTheme={dominantTheme} />
-
-          <div className="relative h-screen w-full overflow-hidden">
-            <div className={`absolute top-0 right-0 border-b border-l w-36 text-[0.6rem] p-1 z-10 pointer-events-none ${separatorClass} ${subtleClass}`}>
-              SYSTEM STATUS: UNSTABLE <br />
-              INITIALIZING: {activeLabel} <br />
-              BUILD: {dominantTheme.toUpperCase()}
-            </div>
-            <div className="h-full w-full overflow-hidden -mt-14 lg:-mt-22">{props.children}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Nav;

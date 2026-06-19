@@ -66,7 +66,7 @@ const SceneByTheme = ({ theme, resolution, mousePos }: { theme: Theme, resolutio
 
 const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play: boolean, mouseReact?: boolean }) => {
   if(theme === "cybernoir") return null;
-  (
+  /*(
     <Hyperspeed
       effectOptions={{
         "distortion":"turbulentDistortion",
@@ -104,7 +104,7 @@ const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play:
         }
       }}
     />
-  );
+  );*/
 
   const camera = useMemo(() => {
     const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1200;

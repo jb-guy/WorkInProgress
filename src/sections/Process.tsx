@@ -1,4 +1,4 @@
-import { use, useState, useRef } from "react";
+import { use, useState, useRef, useMemo, memo } from "react";
 import { useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
@@ -53,12 +53,16 @@ const items = [
 
 const ProcessOuterContent = ({ theme }: { theme: Theme }) => {
   const {activeItemId} = useSectionInteraction("process");
-  const step = activeItemId ? items.findIndex(item => item.id === activeItemId) : 0;
+  const step = useMemo(() => {
+    if (!activeItemId) return 0;
+    const index = items.findIndex(item => item.id === activeItemId);
+    return index !== -1 ? index : 0;
+  }, [activeItemId]);
 
   return (
   <div className="process-theme theme-bg relative h-screen w-full overflow-hidden">
     <div className="absolute inset-0 lg:translate-x-2/10 lg:translate-y-1/10">
-      {theme === "dreamscape" && <KoiCatScene step={step} />}
+      {theme == "dreamscape" && <KoiCatScene step={step}/>}
     </div>
   </div>
 )};
@@ -66,7 +70,11 @@ const ProcessOuterContent = ({ theme }: { theme: Theme }) => {
 const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { activeItemId, setActiveItemId } = useSectionInteraction("process");
-  const step = activeItemId ? items.findIndex(item => item.id === activeItemId) : 0;
+  const step = useMemo(() => {
+    if (!activeItemId) return 0;
+    const index = items.findIndex(item => item.id === activeItemId);
+    return index !== -1 ? index : 0;
+  }, [activeItemId]);
 
     const queueSceneUpdate = useQueuedSceneUpdate();
     const { scrollYProgress } = useScroll({
@@ -84,7 +92,7 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
       queueSceneUpdate({
         themeLeft: "cybernoir",
         themeRight: "dreamscape",
-        splitMode: "angled",
+        splitMode: "vertical",
         transition: latest,
       });
     });
@@ -103,7 +111,7 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
       {items.map((item) => (
         <button
           key={item.id}
-          className="size-12 text-sub rounded-full! lg:rounded-xl! text-xs max-w-32"
+          className="size-12 lg:size-auto text-sub rounded-full! lg:rounded-xl! text-xs max-w-32"
           onClick={() => setActiveItemId(item.id)}
         >
           {window.innerWidth >= 1024 ? item.title : `0${item.id}`}
