@@ -82,12 +82,15 @@ const useKoiCatModel = () => {
 
         // Set initial scales
         const baseScale = 0.01;
+        objects.all.scale.set(baseScale, baseScale, baseScale);
         objects.cat.scale.set(baseScale, baseScale, baseScale);
         objects.fishes.scale.set(baseScale, baseScale, baseScale);
         objects.rose.scale.set(baseScale, baseScale, baseScale);
         objects.lotos.scale.set(baseScale, baseScale, baseScale);
         objects.decoration.scale.set(baseScale, baseScale, baseScale);
         objects.environment.scale.set(baseScale, baseScale, baseScale);
+
+        animate(objects.all.scale, { x: 1, y: 1, z: 1 }, { duration: 0.2 });
 
         setModel({
           scene: clonedScene,
@@ -107,16 +110,16 @@ const useKoiCatModel = () => {
 };
 
 const cameraPositions = [
-  {x: 0, y: 0, z: 5},
-  {x: -1, y: 1, z: 2},
-  {x: -0.1, y: 3, z: 0.2},
-  {x: 0, y: -1, z: 2},
+  {x: 0, y: 0, z: 6},
+  {x: -2, y: 2, z: 4},
+  {x: -0.2, y: 6, z: 0.4},
+  {x: 0, y: -2, z: 4},
   {x: -1, y: 1, z: 4},
-  {x: -1, y: 1, z: 4},
+  {x: -1, y: 1, z: 5},
 ]
 const lookAtPositions = [
   {x: 0, y: 0, z: 0},
-  {x: 0, y: 0.5, z: 0},
+  {x: 0, y: 0, z: 0},
   {x: 0, y: 0, z: 0},
   {x: 0, y: -0.5, z: 0},
   {x: 0, y: 0, z: 0},

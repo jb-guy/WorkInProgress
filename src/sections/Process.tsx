@@ -61,6 +61,7 @@ const ProcessOuterContent = ({ theme }: { theme: Theme }) => {
 
   return (
   <div className="process-theme theme-bg relative h-screen w-full overflow-hidden">
+    {theme == "dreamscape" && <img src="/processpotion.png" alt="Process Background" className="absolute inset-0 w-full h-full scale-110 object-cover"/>}
     <div className="absolute inset-0 lg:translate-x-2/10 lg:translate-y-1/10">
       {theme == "dreamscape" && <KoiCatScene step={step}/>}
     </div>
