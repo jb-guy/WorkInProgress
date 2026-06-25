@@ -70,7 +70,7 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
   }, [isInView]);
 
   const progress = useMemo(() => {
-    if (activeItemId && details === "inView") return 0.75;   // fully confirmed
+    if (activeItemId && details === "inView") return window.innerWidth > 768 ? 0.75 : 1.0; 
     return 0.1;
   }, [focusedItemId, activeItemId, details]);
 

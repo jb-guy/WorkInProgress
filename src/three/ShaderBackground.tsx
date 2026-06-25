@@ -9,7 +9,7 @@ void main(){gl_Position=vec4(position,1.0);}
 
 const fragment = `
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 #endif
 uniform vec2 uResolution;
 uniform float uTime;
@@ -117,14 +117,11 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	value = simplex3d_fractal(p3*4.0+4.0);
 	value = value+expansion;
   value *= 2.0;
-	value = clamp(value, 0.0, 1.0);
+	value = clamp(value, 0.001, 1.0);
 	
 	vec4 color = texture(uTexture, fragCoord / uResolution.xy);
-	if(color.a == 0.0){
-		color = vec4(1.0);
-	}
 
-	fragColor = vec4(color.rgb / vec3(clamp(value*(uProgress-0.1)/0.1, 0.0, 1.0)),value);
+	fragColor = vec4(color.rgb * vec3(clamp(value*(uProgress-0.1)/0.1, 0.0, 1.0)), value);
 	return;
 }
 

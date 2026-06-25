@@ -154,6 +154,7 @@ export default function Carousel({
     setTimeout(() => {
       const activeIndex = loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
       setActiveItemId(items[activeIndex]?.id ?? null);
+      setFocusedItemId(items[activeIndex]?.id ?? null);
     }, 300);
   };
 
