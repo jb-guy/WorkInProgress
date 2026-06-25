@@ -51,14 +51,14 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
         <p className="theme-text mt-6 max-w-xl text-center text-sm">
           Whether you have a question, a project idea or just want to say hi, feel free to reach out.
         </p>
-        <button onClick={() => window.location.href = "mailto:jeanbaptiste.guy2358@gmail.com"} className="theme-link mt-6">
+        <button onClick={() => window.location.href = "mailto:jeanbaptiste.guy2358@gmail.com"} className="theme-button mt-6">
           Send me an email
         </button>
-        <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-link">
+        <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-button">
           Visit my LinkedIn
         </button>
-        <button onClick={() => {setDevMode(true)}} >
-          Unlock Style tool
+        <button onClick={() => {queueSceneUpdate({splitMode: "mouse"}); setDevMode(true);}} className="theme-button">
+          Behind the scenes
         </button>
       </div>
       <div className="min-w-[15vw] w-[20vw] h-full theme-spacer" />

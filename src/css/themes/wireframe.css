@@ -52,17 +52,17 @@
   outline: 1px solid var(--theme-card-border-color);
 }
 
-[data-theme="wireframe"] button:hover {
+[data-theme="wireframe"] .theme-button:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 
-[data-theme="wireframe"] button::before {
+[data-theme="wireframe"] .theme-button::before {
   position: absolute;
   left: 0rem;
   content: "[ ";
 }
-[data-theme="wireframe"] button::after {
+[data-theme="wireframe"] .theme-button::after {
   position: absolute;
   right: 0rem;
   content: " ]";

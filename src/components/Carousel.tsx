@@ -127,17 +127,15 @@ export default function Carousel({
 
   useEffect(() => {
     if (!loop && position > itemsForRender.length - 1) {
-      console.log("wesh")
       setPosition(Math.max(0, itemsForRender.length - 1));
     }
-    if (itemsForRender.length === 0) {
+    if (itemsForRender.length === 0 && !isAnimating) {
       setActiveItemId(null);
     } else {
       const activeIndex = loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
-      setActiveItemId(items[activeIndex]?.id ?? null);
-      setFocusedItemId(items[activeIndex]?.id ?? null);
+      
     }
-  }, [itemsForRender.length, loop, position]);
+  }, [itemsForRender.length, loop, position, isAnimating]);
 
   useEffect(() => {
     const activeIndex = loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
@@ -150,8 +148,13 @@ export default function Carousel({
   const effectiveTransition = isJumping ? { duration: 0 } : SPRING_OPTIONS;
 
   const handleAnimationStart = () => {
+    if(isAnimating) return;
     setIsAnimating(true);
     setActiveItemId(null);
+    setTimeout(() => {
+      const activeIndex = loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
+      setActiveItemId(items[activeIndex]?.id ?? null);
+    }, 300);
   };
 
   const handleAnimationComplete = () => {
@@ -218,72 +221,112 @@ export default function Carousel({
   const activeIndex =
     items.length === 0 ? 0 : loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
 
-
   return (
     <div
-      ref={containerRef}
-      className={`relative overflow-hidden  p-4 ${
-        round ? 'rounded-full border border-white' : 'rounded-[24px] border border-[#222]'
-      }`}
-      style={{
-        width: `${baseWidth}px`,
-        ...(round && { height: `${baseWidth}px` })
-      }}
-    >
-      <motion.div
-        className="flex"
-        drag={isAnimating ? false : 'x'}
-        {...dragProps}
+      className={`relative`}
         style={{
-          width: itemWidth,
-          gap: `${GAP}px`,
-          perspective: 1000,
-          perspectiveOrigin: `${position * trackItemOffset + itemWidth / 2}px 50%`,
-          x
-        }}
-        onDragEnd={handleDragEnd}
-        onDragStart={() => setActiveItemId(null)}
-        animate={{ x: -(position * trackItemOffset) }}
-        transition={effectiveTransition}
-        onAnimationStart={handleAnimationStart}
-        onAnimationComplete={handleAnimationComplete}
+          width: `${baseWidth}px`,
+          ...(round && { height: `${baseWidth}px` })
+        }}>
+      <div
+        ref={containerRef}
+        className={`relative overflow-hidden  p-4 ${
+          round ? 'rounded-full border border-white' : 'rounded-[24px] border border-[#222]'
+        }`}
       >
-        {itemsForRender.map((item, index) => (
-          <CarouselItem
-            key={`${item?.id ?? index}-${index}`}
-            item={item}
-            index={index}
-            itemWidth={itemWidth}
-            round={round}
-            trackItemOffset={trackItemOffset}
-            x={x}
-            transition={effectiveTransition}
-          />
-        ))}
-      </motion.div>
-      <div className={`flex w-full justify-center ${round ? 'absolute z-20 bottom-12 left-1/2 -translate-x-1/2' : ''}`}>
-        <div className="mt-4 flex w-[150px] justify-between px-8">
-          {items.map((_, index) => (
-            <motion.div
-              key={index}
-              className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${
-                activeIndex === index
-                  ? round
-                    ? 'bg-white'
-                    : 'bg-[#333333]'
-                  : round
-                    ? 'bg-[#555]'
-                    : 'bg-[rgba(51,51,51,0.4)]'
-              }`}
-              animate={{
-                scale: activeIndex === index ? 1.2 : 1
-              }}
-              onClick={() => setPosition(loop ? index + 1 : index)}
-              transition={{ duration: 0.15 }}
+        <motion.div
+          className="flex -z-100"
+          drag={isAnimating ? false : 'x'}
+          {...dragProps}
+          style={{
+            width: itemWidth,
+            gap: `${GAP}px`,
+            perspective: 1000,
+            perspectiveOrigin: `${position * trackItemOffset + itemWidth / 2}px 50%`,
+            x
+          }}
+          onDragEnd={handleDragEnd}
+          onDragStart={() => setActiveItemId(null)}
+          animate={{ x: -(position * trackItemOffset) }}
+          transition={effectiveTransition}
+          onAnimationStart={handleAnimationStart}
+          onAnimationComplete={handleAnimationComplete}
+        >
+          {itemsForRender.map((item, index) => (
+            <CarouselItem
+              key={`${item?.id ?? index}-${index}`}
+              item={item}
+              index={index}
+              itemWidth={itemWidth}
+              round={round}
+              trackItemOffset={trackItemOffset}
+              x={x}
+              transition={effectiveTransition}
             />
           ))}
+        </motion.div>
+        <div className={`flex w-full justify-center ${round ? 'absolute z-100 bottom-12 left-1/2 -translate-x-1/2' : ''}`}>
+          <div className="mt-4 flex w-[150px] justify-between px-8">
+            {items.map((_, index) => (
+              <motion.div
+                key={index}
+                className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${
+                  activeIndex === index
+                    ? round
+                      ? 'bg-white'
+                      : 'bg-[#333333]'
+                    : round
+                      ? 'bg-[#555]'
+                      : 'bg-[rgba(51,51,51,0.4)]'
+                }`}
+                animate={{
+                  scale: activeIndex === index ? 1.2 : 1
+                }}
+                onClick={() => setPosition(loop ? index + 1 : index)}
+                transition={{ duration: 0.15 }}
+              />
+            ))}
+          </div>
         </div>
       </div>
+        {/* Left Arrow Button */}
+        <motion.button
+          onClick={() => setPosition(prev => Math.max(prev - 1, 0))}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-50 p-2 rounded-full border bg-primary border-light"
+          whileHover={ { scale: 1.1 } }
+          whileTap={ { scale: 0.95 } }
+        >
+          <svg
+            className="w-5 h-5 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </motion.button>
+
+        {/* Right Arrow Button */}
+        <motion.button
+          onClick={() => setPosition(prev => Math.min(prev + 1, itemsForRender.length-1))}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-50 p-2 rounded-full border bg-primary border-light"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <svg
+            className="w-5 h-5 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </motion.button>
     </div>
+    
   );
 }
+
+

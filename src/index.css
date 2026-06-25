@@ -1,12 +1,32 @@
 @import "tailwindcss";
 @import "./css/effects/cinematic-noise.css";
 
+@import "./css/themes/common.css";
+@import "./css/themes/wireframe.css";
+@import "./css/themes/dark.css";
+@import "./css/themes/cybernoir.css";
+@import "./css/themes/holographic.css";
+@import "./css/themes/retro80.css";
+@import "./css/themes/dreamscape.css";
+
 @custom-variant wireframe (&:where([data-theme="wireframe"] *));
 @custom-variant dark (&:where([data-theme="dark"] *));
 @custom-variant cybernoir (&:where([data-theme="cybernoir"] *));
 @custom-variant holographic (&:where([data-theme="holographic"] *));
 @custom-variant retro80 (&:where([data-theme="retro80"] *));
 @custom-variant dreamscape (&:where([data-theme="dreamscape"] *));
+
+
+@theme inline {
+  --color-primary: var(--primary-color, #111111);
+  --color-secondary: var(--secondary-color, #ffff00);
+  --color-tertiary: var(--tertiary-color, #9ca3af);
+  --color-muted: var(--muted-color, #d1d5db);
+  --color-darker: var(--darker-color, #1f2937);
+  --color-light: var(--light, #ffffff);
+  --color-dark: var(--dark, #000000);
+}
+
 
 /* ── Base resets ── */
 * { box-sizing: border-box; }
@@ -27,11 +47,3 @@ html, body { margin: 0; padding: 0; }
       rgba(0, 0, 0, 0) calc(50% + 0.8px),
       rgba(0, 0, 0, 0) 100%);
 }
-
-    @import "./css/themes/common.css";
-    @import "./css/themes/wireframe.css";
-    @import "./css/themes/dark.css";
-    @import "./css/themes/cybernoir.css";
-    @import "./css/themes/holographic.css";
-    @import "./css/themes/retro80.css";
-    @import "./css/themes/dreamscape.css";

@@ -1,6 +1,6 @@
 [data-theme="dreamscape"] {
 
-  --dark: #111111;
+  --dark: #14110f;
   --light: #f0f0f0;
   
   --primary-color: #FF8D8B;
@@ -11,21 +11,21 @@
 
   --theme-bg: var(--muted-color);
 
-  --theme-title-color: var(--light);
+  --theme-title-color: var(--dark);
   --theme-title-font: "Inter", "Segoe UI", sans-serif;
 
   --theme-text-color: var(--light);
   --theme-text-font: "Inter", "Segoe UI", sans-serif;
   --theme-sub-color: var(--primary-color);
 
-  --theme-card-bg: color-mix(in srgb, var(--darker-color) 50%, #00000050 50%);
+  --theme-card-bg: color-mix(in srgb, var(--darker-color) 0%, #00000050 100%);
   --theme-card-border: 1px solid color-mix(in srgb, var(--muted-color) 80%, transparent 20%);;
   --theme-card-border-radius: 2em;
   --theme-card-padding: 1rem;
   --theme-card-margin: 1rem;
   --theme-card-text-color: var(--light);
 
-  --theme-button-bg: color-mix(in srgb, var(--darker-color) 50%, #00000050 50%);
+  --theme-button-bg: color-mix(in srgb, var(--darker-color) 0%, #00000020 100%);
   --theme-button-border-radius: 9px;
   --theme-button-border: 1px solid var(--light);
   --theme-button-text: var(--light);

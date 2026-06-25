@@ -11,15 +11,15 @@ type SectionInteractionState = {
   focusedItemId: ItemId;
 };
 
-type InteractionStateBySection = Partial<Record<SectionId, SectionInteractionState>>;
+type InteractionStateBySection = Partial<Record<SectionId|"nav", SectionInteractionState>>;
 
 type SectionInteractionContextValue = {
   stateBySection: InteractionStateBySection;
-  setInteraction: (sectionId: SectionId, interaction: string | null) => void;
-  setDetails: (sectionId: SectionId, details: any) => void;
-  setHoveredItemId: (sectionId: SectionId, itemId: ItemId) => void;
-  setActiveItemId: (sectionId: SectionId, itemId: ItemId) => void;
-  setFocusedItemId: (sectionId: SectionId, itemId: ItemId) => void;
+  setInteraction: (sectionId: SectionId|"nav", interaction: string | null) => void;
+  setDetails: (sectionId: SectionId|"nav", details: any) => void;
+  setHoveredItemId: (sectionId: SectionId|"nav", itemId: ItemId) => void;
+  setActiveItemId: (sectionId: SectionId|"nav", itemId: ItemId) => void;
+  setFocusedItemId: (sectionId: SectionId|"nav", itemId: ItemId) => void;
 };
 
 const EMPTY_SECTION_STATE: SectionInteractionState = {
@@ -41,7 +41,7 @@ const SectionInteractionContext = createContext<SectionInteractionContextValue>(
 
 const patchSectionState = (
   previous: InteractionStateBySection,
-  sectionId: SectionId,
+  sectionId: SectionId|"nav",
   patch: Partial<SectionInteractionState>,
 ): InteractionStateBySection => {
   const current = previous[sectionId] ?? EMPTY_SECTION_STATE;
@@ -83,7 +83,7 @@ export const SectionInteractionProvider = ({ children }: { children: ReactNode }
   );
 };
 
-export const useSectionInteraction = (sectionId: SectionId) => {
+export const useSectionInteraction = (sectionId: SectionId|"nav") => {
   const context = useContext(SectionInteractionContext);
   const sectionState = context.stateBySection[sectionId] ?? EMPTY_SECTION_STATE;
 

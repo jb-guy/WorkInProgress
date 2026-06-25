@@ -75,11 +75,11 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
   }, [focusedItemId, activeItemId, details]);
 
   return (
-    <div className="work-theme z-10 theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center overflow-visible">
+    <div className="work-theme theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center overflow-visible">
       <div className="absolute w-[55vh] h-[55vh] top-[25vh] lg:top-[35vh]">
         <div ref={container} className="absolute inset-16 lg:inset-12 theme-border rounded-full"/>
       </div>
-      <div className="h-[100vw] w-[100vh] min-w-screen min-h-screen top-[-27.5vh] lg:top-[-20.5vh] overflow-visible">
+      <div className="h-[100vw] w-[100vh] z-10 min-w-screen min-h-screen top-[-27.5vh] lg:top-[-20.5vh] overflow-visible">
         {theme === "cybernoir" && (
           <img src="/cyberworkbg.png" alt="cybernoir theme overlay" className="absolute size-full scale-120 -top-60 left-1 lg:-top-11 object-none object-[50%_44%] lg:object-[50%_60%] pointer-events-none" />
         )}

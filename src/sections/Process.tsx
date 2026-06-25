@@ -60,8 +60,8 @@ const ProcessOuterContent = ({ theme }: { theme: Theme }) => {
   }, [activeItemId]);
 
   return (
-  <div className="process-theme theme-bg relative h-screen w-full overflow-hidden">
-    {theme == "dreamscape" && <img src="/processpotion.png" alt="Process Background" className="absolute inset-0 w-full h-full scale-110 object-cover"/>}
+  <div className="process-theme z-5 theme-bg relative h-screen w-full">
+    {theme == "dreamscape" && <img src="/processpotionvertical.png" alt="Process Background" className="absolute w-full h-2/1 scale-100 -translate-y-2/5 object-cover"/>}
     <div className="absolute inset-0 lg:translate-x-2/10 lg:translate-y-1/10">
       {theme == "dreamscape" && <KoiCatScene step={step}/>}
     </div>
@@ -91,10 +91,10 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
     useMotionValueEvent(scrollYProgress, "change", (latest) => {
       if (right) return;
       queueSceneUpdate({
-        themeLeft: "cybernoir",
-        themeRight: "dreamscape",
+        themeLeft: "dreamscape",
+        themeRight: "cybernoir",
         splitMode: "vertical",
-        transition: latest,
+        transition: (1-latest),
       });
     });
 
@@ -104,7 +104,7 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
       03 — Process
     </p>
     <div className="w-full h-0 theme-border border-b-0!"/>
-    <h2 className="theme-title pt-4 mb-6 lg:ml-10 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-5xl">
+    <h2 className="theme-title text-dark! pt-4 mb-6 lg:ml-10 text-4xl sm:text-5xl font-bold leading-none tracking-tight lg:text-5xl">
       Development Process
     </h2>
 
@@ -112,7 +112,7 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
       {items.map((item) => (
         <button
           key={item.id}
-          className="size-12 lg:size-auto text-sub rounded-full! lg:rounded-xl! text-xs max-w-32"
+          className={`size-12 lg:size-auto bg-stone-800/20 px-2 text-light border border-light/100 rounded-full! lg:rounded-xl! text-xs  ${activeItemId === item.id ? "border-lime-400!" : ""}`}
           onClick={() => setActiveItemId(item.id)}
         >
           {window.innerWidth >= 1024 ? item.title : `0${item.id}`}
@@ -122,8 +122,8 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
     
     <div className="h-full w-full">
       <div className="h-full w-full flex flex-col lg:flex-row">
-        <div className=" h-80 lg:h-full lg:grow theme-spacer"/>
-        <div className="lg:order-first lg:w-7/20 theme-card flex flex-col justify-center text-left">
+        <div className="lg:h-full lg:grow theme-spacer"/>
+        <div className="lg:order-first lg:w-7/20 theme-card backdrop-blur-xl mix-blend-normal will-change-transform flex flex-col justify-center text-left">
           <h3 className="theme-title mx-5 text-3xl font-bold leading-none tracking-tight lg:text-5xl">
             {items[step].title}
           </h3>

@@ -42,6 +42,10 @@ const getTransitionStyle = (
       const diagonale = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
       return `clip-path: circle(${(transition * diagonale) / 2}px at 50% 50%)`;
     }
+    case "mouse": {
+      const diagonale = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
+      return `clip-path: circle(${(transition * diagonale) / 2}px at var(--mouse-x, 50%) var(--mouse-y, 50%))`;
+    }
     case "square":
       return `clip-path: inset(${(1 - transition) * 50}% ${(1 - transition) * 50}% ${(1 - transition) * 50}% ${(1 - transition) * 50}%)`;
     default:
@@ -128,6 +132,7 @@ function SplitHandle({
 
 export default function SplitViewport() {
   const [activeSection, setActiveSection] = useState<SectionId>("hero");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
   const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 800);
   const { themeLeft, themeRight, dominantTheme, devMode } = useTheme();
@@ -146,6 +151,23 @@ export default function SplitViewport() {
   const isDragging = useRef(false);
   const splitLineRef = useRef<HTMLDivElement>(null);
   const scrollRafRef = useRef<number | null>(null);
+
+  // Handle scroll to section from menu
+  const handleSectionClick = useCallback((sectionId: SectionId) => {
+    const sectionIndex = SECTIONS.findIndex((s) => s.id === sectionId);
+    if (sectionIndex === -1) return;
+
+    const targetScrollY = sectionIndex * (typeof window !== "undefined" ? window.innerHeight : 800);
+    window.scrollTo({
+      top: targetScrollY,
+      behavior: "smooth",
+    });
+
+    // Close menu after a brief delay to ensure scroll starts
+    setTimeout(() => {
+      setIsMenuOpen(false);
+    }, 100);
+  }, []);
 
   const updateRootClips = useCallback(() => {
     applyClipPath(outerRightClipRef.current, splitMode, splitAngleDeg, transitionRef.current, themeRightOpacity);
@@ -195,6 +217,22 @@ export default function SplitViewport() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  useEffect(() => {
+    if (splitMode === "mouse") {
+      document.addEventListener("mousemove", (e) => {
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        document.documentElement.style.setProperty("--mouse-x", `${mouseX}px`);
+        document.documentElement.style.setProperty("--mouse-y", `${mouseY}px`);
+      });
+    }
+    return () => {
+      if (splitMode === "mouse") {
+        document.removeEventListener("mousemove", () => {});
+      }
+    };
+  }, [splitMode]);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
@@ -277,7 +315,11 @@ export default function SplitViewport() {
     <div ref={appRootRef} className="relative" style={{ "--scroll-y": "0px" } as React.CSSProperties}>
       <div className="fixed inset-0 pointer-events-none z-150">
         <div className="px-2 pt-2 lg:px-10 lg:pt-10">
-          <NavControlsBar dominantTheme={dominantTheme} />
+          <NavControlsBar
+            dominantTheme={dominantTheme}
+            isMenuOpen={isMenuOpen}
+            onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+          />
         </div>
         <NavStatusBadge activeSection={activeSection} dominantTheme={dominantTheme} />
       </div>
@@ -292,7 +334,13 @@ export default function SplitViewport() {
 
       <div className="absolute inset-0 pointer-events-none">
         <div ref={innerLeftClipRef} className="fixed inset-0 overflow-hidden will-change-transform" data-theme={themeLeft}>
-          <NavWindow dominantTheme={themeLeft}>
+          <NavWindow
+            dominantTheme={themeLeft}
+            isMenuOpen={isMenuOpen}
+            onMenuClose={() => setIsMenuOpen(false)}
+            activeSection={activeSection}
+            onSectionClick={handleSectionClick}
+          >
             <div ref={innerLeftStackRef} className="w-full will-change-scroll">
               {innerLeftSections}
             </div>
@@ -310,7 +358,13 @@ export default function SplitViewport() {
 
       <div className="absolute inset-0 pointer-events-none">
         <div ref={innerRightClipRef} className="fixed inset-0 overflow-hidden will-change-transform" data-theme={themeRight}>
-          <NavWindow dominantTheme={themeRight}>
+          <NavWindow
+            dominantTheme={themeRight}
+            isMenuOpen={isMenuOpen}
+            onMenuClose={() => setIsMenuOpen(false)}
+            activeSection={activeSection}
+            onSectionClick={handleSectionClick}
+          >
             <div ref={innerRightStackRef} className="w-full will-change-scroll">
               {innerRightSections}
             </div>

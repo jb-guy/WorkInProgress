@@ -82,7 +82,7 @@
   }
 }
 
-[data-theme="retro80"] button{
+[data-theme="retro80"] .theme-button{
   position: relative;
   overflow: hidden;
   box-shadow:
@@ -92,7 +92,7 @@
     inset 0 0 20px 10px rgba(255, 255, 255, 1);
 }
 
-[data-theme="retro80"] button::before {
+[data-theme="retro80"] .theme-button::before {
   content: "";
   position: absolute;
   top: 0;

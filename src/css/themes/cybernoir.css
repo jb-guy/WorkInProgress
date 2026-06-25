@@ -15,7 +15,8 @@
   --theme-sub-color: var(--primary-color);
 
   --theme-card-bg: var(--dark);
-  --theme-card-border-width: 1px;
+  --theme-card-border-width: 2px;
+  --theme-card-border-radius: 0.5em;
   --theme-card-border-color: var(--primary-color);
   --theme-card-padding: 0.75rem;
   --theme-card-margin: 1rem;
@@ -33,7 +34,7 @@
 }
 
 [data-theme="cybernoir"] .theme-card {
-  box-shadow: 0 0 20px var(--primary-color);
+  box-shadow: 0 0 10px 5px var(--primary-color);
 }
 
 [data-theme="cybernoir"] h1::after,

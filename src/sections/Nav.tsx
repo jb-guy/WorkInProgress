@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   SPLIT_MODES,
   THEMES,
@@ -7,6 +8,8 @@ import {
   type SplitMode,
   type Theme,
 } from "../context/ThemeContext";
+import { SectionMenu } from "../components/SectionMenu";
+import {motion, useScroll} from "motion/react"
 
 export type SectionId = "hero" | "about" | "process" | "work" | "contact";
 
@@ -18,11 +21,17 @@ type Props = {
 
 type NavChromeProps = {
   dominantTheme: Theme;
+  isMenuOpen?: boolean;
+  onMenuToggle?: () => void;
 };
 
 type NavWindowProps = {
   children?: React.ReactNode;
   dominantTheme: Theme;
+  isMenuOpen: boolean;
+  onMenuClose?: () => void;
+  activeSection?: SectionId;
+  onSectionClick?: (sectionId: SectionId) => void;
 };
 
 type NavStatusProps = {
@@ -77,7 +86,8 @@ const getPalette = (theme: Theme) => {
   };
 };
 
-export const NavControlsBar = ({ dominantTheme }: NavChromeProps) => {
+export const NavControlsBar = ({ dominantTheme, isMenuOpen, onMenuToggle }: NavChromeProps) => {
+  const { scrollYProgress } = useScroll();
   const {
     splitMode,
     splitAngleDeg,
@@ -95,14 +105,25 @@ export const NavControlsBar = ({ dominantTheme }: NavChromeProps) => {
     setDevMode,
   } = useTheme();
   const { separatorClass, selectClass } = getPalette(dominantTheme);
-
+  console.log(scrollYProgress.get(), "scrollYProgress.get()");
   return (
-    <div className={`h-12 flex items-center justify-between pointer-events-auto backdrop-blur-[2px] ${separatorClass} border rounded-t-xl lg:rounded-t-2xl`}>
-      <button className={`h-full w-16 border-r shrink-0 ${separatorClass}`}>
+    <div className={`h-12 flex items-center justify-between pointer-events-auto backdrop-blur-xs ${separatorClass} overflow-hidden border rounded-t-xl lg:rounded-t-2xl`}>
+      <button
+        onClick={onMenuToggle}
+        className={`h-full w-16 border-r shrink-0 ${separatorClass} transition-opacity hover:opacity-70`}
+        aria-label="Toggle navigation menu"
+        aria-pressed={isMenuOpen}
+      >
         <div className="h-px w-4 bg-current mx-auto" />
         <div className="h-px w-4 bg-current mx-auto mt-1" />
         <div className="h-px w-4 bg-current mx-auto mt-1" />
       </button>
+      <div className="h-full w-full">
+        <motion.div
+          className={`${separatorClass} h-full w-full origin-left`}
+          style={{ scaleX: scrollYProgress }}
+        />
+      </div>
       {(devMode) && <>
         <div className="flex items-center gap-2">
           <ThemeSelect value={themeLeft} onChange={setThemeLeft} label="L:" selectClass={selectClass} />
@@ -166,12 +187,29 @@ export const NavStatusBadge = ({ activeSection, dominantTheme }: NavStatusProps)
   );
 };
 
-export const NavWindow = ({ children, dominantTheme }: NavWindowProps) => {
+export const NavWindow = ({
+  children,
+  dominantTheme,
+  isMenuOpen,
+  onMenuClose,
+  activeSection,
+  onSectionClick,
+}: NavWindowProps) => {
   const { frameClass } = getPalette(dominantTheme);
 
   return (
     <div className="h-screen w-full fixed p-2 lg:p-10 pt-14 lg:pt-22 pointer-events-none">
-      <div className={`h-full w-full border border-t-0 rounded-b-xl lg:rounded-b-2xl overflow-hidden pointer-events-none ${frameClass} transition-colors`}>
+      <div className={`h-full w-full border border-t-0 rounded-b-xl lg:rounded-b-2xl overflow-hidden pointer-events-none ${frameClass} transition-colors relative`}>
+        {onMenuClose && onSectionClick && (
+          <SectionMenu
+            isOpen={isMenuOpen}
+            onClose={onMenuClose}
+            activeSection={activeSection}
+            onSectionClick={onSectionClick}
+            dominantTheme={dominantTheme}
+            frameClass={frameClass}
+          />
+        )}
         <div className="h-screen w-full overflow-hidden -mt-14 lg:-mt-22">{children}</div>
       </div>
     </div>

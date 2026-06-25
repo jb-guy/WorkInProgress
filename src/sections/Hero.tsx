@@ -58,7 +58,7 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
         <div className="w-full grow theme-spacer" />
         <div className="m-4 flex flex-col items-start">
           <p className="text-md lg:text-2xl theme-text">
-            Creative Fullstack Developer.
+            Creative Fullstack Architect.
           </p>
           <p className="text-xs lg:text-sm theme-text">
             Building innovative interfaces,
@@ -67,7 +67,7 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
           </p>
           <button
             onClick={handleCta}
-            className="mt-6 px-6 py-2 theme-body self-end text-sm tracking-widest"
+            className="theme-button mt-6 px-6 py-2 theme-body self-end text-sm tracking-widest"
           >
             View Work
           </button>
