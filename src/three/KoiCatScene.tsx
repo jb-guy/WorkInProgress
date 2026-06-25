@@ -7,6 +7,7 @@ import { useSplitTransition } from "../context/ThemeContext";
 
 type Props = {
   step: number;
+  visible?: boolean;
 }
 
 // ===== Module-level GLTF Loader & Cache =====
@@ -129,7 +130,7 @@ const lookAtPositions = [
 
 const lookAt = new THREE.Vector3(0, 0, 0);
 
-const KoiCatModel = ({step}: Props) => {
+const KoiCatModel = ({step, visible}: Props) => {
   // Call all hooks at top level before any conditionals
   const { model, isLoading } = useKoiCatModel();
   const camera = useThree((state) => state.camera);
@@ -190,10 +191,10 @@ const KoiCatModel = ({step}: Props) => {
     return null;
   }
 
-  return <primitive object={model.scene} />
+  return <primitive object={model.scene} visible={visible} />
 }
 
-const KoiCatScene = ({step}: Props) => {
+const KoiCatScene = ({step, visible}: Props) => {
   // Calculate adaptive DPR for performance on mobile
   const maxDpr = useMemo(() => {
     if (typeof window === "undefined") return 1.25;
@@ -207,7 +208,7 @@ const KoiCatScene = ({step}: Props) => {
         gl={{ antialias: false, alpha: true }}
       >
         <ambientLight color={"#ffffff"} intensity={3} />
-        <KoiCatModel step={step} />
+        <KoiCatModel step={step} visible={visible} />
       </Canvas>
     </div>
   )

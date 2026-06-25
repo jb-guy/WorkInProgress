@@ -51,7 +51,7 @@ const items = [
 ];
 
 
-const ProcessOuterContent = ({ theme }: { theme: Theme }) => {
+const ProcessOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) => {
   const {activeItemId} = useSectionInteraction("process");
   const step = useMemo(() => {
     if (!activeItemId) return 0;
@@ -63,7 +63,7 @@ const ProcessOuterContent = ({ theme }: { theme: Theme }) => {
   <div className="process-theme z-5 theme-bg relative h-screen w-full">
     {theme == "dreamscape" && <img src="/processpotionvertical.png" alt="Process Background" className="absolute w-full h-2/1 scale-100 -translate-y-2/5 object-cover"/>}
     <div className="absolute inset-0 lg:translate-x-2/10 lg:translate-y-1/10">
-      {theme == "dreamscape" && <KoiCatScene step={step}/>}
+      {!right &&<KoiCatScene step={step} visible={theme == "dreamscape"}/>}
     </div>
   </div>
 )};
