@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode, type RefObject } from "react";
 
-export const THEMES = ["wireframe", "dark", "cybernoir", "holographic", "retro80", "dreamscape"] as const;
+export const THEMES = ["wireframe", "cybernoir", "holographic", "retro80", "dreamscape", "deepspace"] as const;
 export type Theme = (typeof THEMES)[number];
-export const isDarkTheme = (theme: Theme) => theme === "dark" || theme === "cybernoir" || theme === "holographic";
+export const isDarkTheme = (theme: Theme) => theme === "cybernoir" || theme === "holographic" || theme === "deepspace";
 export const SPLIT_MODES = ["vertical", "horizontal", "angled", "overlaped", "clip", "circle", "square", "mouse"] as const;
 export type SplitMode = (typeof SPLIT_MODES)[number];
 
@@ -10,11 +10,13 @@ interface ThemeContextValue {
   themeLeft: Theme;
   themeRight: Theme;
   devMode?: boolean;
+  exploreMode?: boolean;
   dominantTheme: Theme;
   setDominantTheme: (theme: Theme) => void;
   setThemeLeft: (t: Theme) => void;
   setThemeRight: (t: Theme) => void;
   setDevMode: (dev: boolean) => void;
+  setExploreMode: (explore: boolean) => void;
 }
 
 interface SplitTransitionContextValue {
@@ -30,14 +32,16 @@ interface SplitTransitionContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  themeLeft: "dark",
+  themeLeft: "wireframe",
   themeRight: "wireframe",
-  dominantTheme: "dark",
+  dominantTheme: "wireframe",
   devMode: false,
+  exploreMode: false,
   setThemeLeft: () => {},
   setThemeRight: () => {},
   setDominantTheme: () => {},
   setDevMode: () => {},
+  setExploreMode: () => {},
 });
 
 const SplitTransitionContext = createContext<SplitTransitionContextValue>({
@@ -71,6 +75,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [splitAngleDeg, setSplitAngleDeg] = useState(18);
   const [themeRightOpacity, setThemeRightOpacity] = useState(0);
   const [devMode, setDevMode] = useState(false);
+  const [exploreMode, setExploreMode] = useState(false);
 
   return (
     <ThemeContext.Provider
@@ -79,10 +84,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         themeRight,
         dominantTheme,
         devMode,
+        exploreMode,
         setThemeLeft,
         setThemeRight,
         setDevMode,
         setDominantTheme,
+        setExploreMode,
       }}
     >
       <SplitTransitionContext.Provider

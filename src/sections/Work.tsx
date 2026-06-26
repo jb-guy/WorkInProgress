@@ -19,7 +19,8 @@ const items = [
     title: 'Zentry Copy',
     subtitle: 'Premium Landing Page',
     date: '2025',
-    description: 'Training on Gsap Animation and Cartoon Style'
+    description: 'Training on Gsap Animation and Cartoon Style',
+    front: ['React', 'GSAP', 'TailwindCSS']
   },
   {
     id:"1",
@@ -29,7 +30,9 @@ const items = [
     title: 'EPLab',
     subtitle: 'Electrophysiology Visualization',
     date: '2025',
-    description: 'Visualization of cardiac electrophysiology simulations for research and education'
+    description: 'Visualization of cardiac electrophysiology simulations for research and education',
+    front: ['React', 'Vue', 'Vuetify', 'Three.js', 'WebGL'],
+    back: ['Python', 'FastAPI', 'Websocket', 'Docker', 'Kafka']
   },
   {
     id:"2",
@@ -39,7 +42,8 @@ const items = [
     title: 'Nathalie Guy',
     subtitle: 'Artistic Portfolio',
     date: '2026',
-    description: 'Showcasing the artistic works and projects of Nathalie Guy'
+    description: 'Showcasing the artistic works and projects of Nathalie Guy',
+    front: ['React', 'GSAP', 'TailwindCSS', 'emailJS'],
   },
   {
     id:"3",
@@ -49,7 +53,8 @@ const items = [
     title: 'Bouts du Monde',
     subtitle: 'Interactive Storytelling',
     date: '2020',
-    description: 'Immersive web experience for the promotion of the magazine "Bouts du Monde"'
+    description: 'Immersive web experience for the promotion of the magazine "Bouts du Monde"',
+    front: ['Javascript', 'JQuery', 'WebGL'],
   }
 ];
 
@@ -151,7 +156,7 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
           {activeItemId &&
           (<>
             <motion.div key="modal" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{opacity:0, x: -100}} className="z-200 lg:order-first theme-card relative lg:w-1/4 pointer-events-auto flex flex-col">
-              <h3 className="text-3xl">{items[Number(activeItemId)]?.title}</h3>
+              <h3 className="text-3xl lg:pt-6">{items[Number(activeItemId)]?.title}</h3>
               <p className="theme-sub mt-6">{items[Number(activeItemId)]?.subtitle}</p>
               <p className="theme-sub opacity-50 text-sm">{items[Number(activeItemId)]?.date}</p>
               <p className="hidden lg:block mt-8 text-sm">{items[Number(activeItemId)]?.description}</p>
@@ -160,7 +165,29 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
               </button>
             </motion.div>
             <motion.div key="stack" initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }} className="z-200 hidden lg:block theme-card w-1/4 pointer-events-auto text-right">
-              <h3 className="text-3xl">Stack used</h3>
+              <h3 className="text-3xl lg:pt-6">Stack used</h3>
+              <div className="mt-8 flex flex-col gap-2">
+                {items[Number(activeItemId)]?.front && (
+                  <div>
+                    <p className="theme-sub text-sm">Front-end</p>
+                    <ul className="mt-2 flex gap-x-2 flex-wrap justify-end">
+                      {items[Number(activeItemId)]?.front.map((tech, index) => (
+                          <li key={index} className="text-sm">{index !== 0 && <span>•</span>} {tech}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {items[Number(activeItemId)]?.back && (
+                  <div className="mt-4">
+                    <p className="theme-sub text-sm">Back-end</p>
+                    <ul className="mt-2 flex gap-x-2 flex-wrap justify-end">
+                      {items[Number(activeItemId)]?.back?.map((tech, index) => (
+                          <li key={index} className="text-sm">{index !== 0 && <span>•</span>} {tech}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </motion.div>
           </>)}
       </AnimatePresence>

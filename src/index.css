@@ -1,16 +1,17 @@
 @import "tailwindcss";
 @import "./css/effects/cinematic-noise.css";
+@import "./css/effects/starfield.css";
 
 @import "./css/themes/common.css";
 @import "./css/themes/wireframe.css";
-@import "./css/themes/dark.css";
+@import "./css/themes/deepspace.css";
 @import "./css/themes/cybernoir.css";
 @import "./css/themes/holographic.css";
 @import "./css/themes/retro80.css";
 @import "./css/themes/dreamscape.css";
 
 @custom-variant wireframe (&:where([data-theme="wireframe"] *));
-@custom-variant dark (&:where([data-theme="dark"] *));
+@custom-variant deepspace (&:where([data-theme="deepspace"] *));
 @custom-variant cybernoir (&:where([data-theme="cybernoir"] *));
 @custom-variant holographic (&:where([data-theme="holographic"] *));
 @custom-variant retro80 (&:where([data-theme="retro80"] *));

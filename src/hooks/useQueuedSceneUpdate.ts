@@ -14,7 +14,7 @@ export type SceneUpdate = {
 const lastTransitionDetails = {current: null as SceneUpdate | null};
 
 export const useQueuedSceneUpdate = () => {
-  const { devMode, setThemeRight, setThemeLeft, dominantTheme, setDominantTheme } = useTheme();
+  const { devMode, exploreMode, setThemeRight, setThemeLeft, dominantTheme, setDominantTheme } = useTheme();
   const {
     setSplitMode,
     setSplitAngleDeg,
@@ -28,7 +28,7 @@ export const useQueuedSceneUpdate = () => {
   const lastDominantThemeRef = useRef<string>("left");
 
   const queueSceneUpdate = useCallback((update: SceneUpdate) => {
-    if (devMode) return;
+    if (devMode || exploreMode) return;
     pendingUpdateRef.current = {
       ...pendingUpdateRef.current,
       ...update,
@@ -60,16 +60,16 @@ export const useQueuedSceneUpdate = () => {
         }
         if (next.transition !== undefined && next.transition !== lastTransitionDetails.current?.transition) {
           setTransition(next.transition);
-          if (next.transition < 0.5 && lastDominantThemeRef.current !== dominantTheme) {
+          if (dominantTheme != "deepspace" && next.transition < 0.5 && lastDominantThemeRef.current !== dominantTheme) {
             setDominantTheme(next.themeLeft || lastTransitionDetails.current?.themeLeft || dominantTheme);
-          } else if (next.transition >= 0.5 && lastDominantThemeRef.current !== dominantTheme) {
+          } else if (dominantTheme != "deepspace" && next.transition >= 0.5 && lastDominantThemeRef.current !== dominantTheme) {
             setDominantTheme(next.themeRight || lastTransitionDetails.current?.themeRight || dominantTheme);
           }
         }
       });
       lastTransitionDetails.current = { ...lastTransitionDetails.current, ...next };
     });
-  }, [devMode, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
+  }, [devMode, exploreMode, dominantTheme, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
 
   /*useEffect(() => {
     return () => {

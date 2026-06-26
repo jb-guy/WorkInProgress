@@ -1,21 +1,49 @@
 import { useEffect, useRef } from "react";
 import { useTheme, type Theme } from "../context/ThemeContext";
-import { useMotionValueEvent, useScroll } from "motion/react";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
-const ContactOuterContent = ({ theme }: { theme: Theme }) => (
-  <div className="contact-theme theme-bg relative h-screen w-full overflow-hidden">
+const ContactOuterContent = ({ theme }: { theme: Theme }) => {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const { setDominantTheme } = useTheme();
+
+  const { scrollYProgress } = useScroll({
+    target: outerRef,
+    offset: ["30% end", "105% end"],
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+
+    if (latest > 0.5) setDominantTheme("deepspace");
+  });
+  
+  return (
+  <div ref={outerRef} className="relative z-20 theme-bg h-screen w-full overflow-show">
+    {theme != "wireframe" && (
+      <motion.div style={{opacity: scrollYProgress}} className="absolute inset-0 z-10 ">
+        <div className="absolute w-full h-[200vh] top-[-100vh] bg-black -z-5"></div>
+
+        <div className="star-field bottom-0 h-1/2">
+          <div className="layer"></div>
+          <div className="layer"></div>
+          <div className="layer"></div>
+        </div>
+
+      </motion.div>
+    )}
   </div>
-);
+)};
+
+const phoneMultiplier = window.innerWidth < 768 ? 1.5 : 1; // Adjust this value to control the speed of the parallax effect
 
 const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const { setDevMode } = useTheme();
+  const { setExploreMode } = useTheme();
   const queueSceneUpdate = useQueuedSceneUpdate();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["30% center", "70% center"],
+    offset: ["30% center", "80% center"],
   });
 
   useMotionValueEvent(scrollYProgress, "animationStart", () => {
@@ -29,7 +57,7 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
       themeLeft: "dreamscape",
       themeRight: "wireframe",
       splitMode: "circle",
-      transition: latest,
+      transition: latest * phoneMultiplier,
     });
   });
 
@@ -38,7 +66,7 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
     <p className="theme-sub mb-2 ml-4 font-mono text-xs uppercase tracking-widest">
       06 — Contact
     </p>
-    <div className="w-full h-0 border"/>
+    <div className="w-full h-0 wireframe:border-t"/>
     <div className="grow w-full flex flex-row">
       <div className="min-w-[15vw] w-[20vw] h-full theme-spacer" />
       <div className="grow flex flex-col items-center justify-center text-center px-4">
@@ -57,13 +85,13 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
         <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-button">
           Visit my LinkedIn
         </button>
-        <button onClick={() => {queueSceneUpdate({splitMode: "mouse"}); setDevMode(true);}} className="theme-button">
+        <button onClick={() => {queueSceneUpdate({splitMode: "mouse"}); setExploreMode(true);}} className="theme-button">
           Behind the scenes
         </button>
       </div>
       <div className="min-w-[15vw] w-[20vw] h-full theme-spacer" />
     </div>
-    <div className="w-full h-0 border"/>
+    <div className="w-full h-0 wireframe:border-t"/>
   </div>
 )};
 

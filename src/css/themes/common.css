@@ -38,7 +38,7 @@
   border-style: var(--theme-card-border-style, inherit);
   border: var(--theme-card-border, none);
   border-radius: var(--theme-card-border-radius, none);
-  padding: var(--theme-card-padding, 2rem);
+  padding: var(--theme-card-padding, 3rem);
   margin: var(--theme-card-margin, 0rem);
   pointer-events: auto;
 }

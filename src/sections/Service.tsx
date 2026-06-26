@@ -6,7 +6,7 @@ const serviceOuterImageByTheme: Record<Theme, string> = {
   wireframe: toSvgDataUri(
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='1200' height='800' fill='#f8fafc'/><g fill='#cbd5e1'><rect x='90' y='130' width='300' height='180' rx='18'/><rect x='430' y='230' width='360' height='220' rx='18'/><rect x='820' y='130' width='280' height='160' rx='18'/></g></svg>`
   ),
-  dark: toSvgDataUri(
+  deepspace: toSvgDataUri(
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='1200' height='800' fill='#1e1b4b'/><g fill='#312e81'><rect x='90' y='130' width='300' height='180' rx='18'/><rect x='430' y='230' width='360' height='220' rx='18'/><rect x='820' y='130' width='280' height='160' rx='18'/></g></svg>`
   ),
   cybernoir: toSvgDataUri(
@@ -27,7 +27,7 @@ const serviceInnerImageByTheme: Record<Theme, string> = {
   wireframe: toSvgDataUri(
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 380'><rect width='640' height='380' fill='#f1f5f9'/><rect x='24' y='24' width='592' height='332' rx='16' fill='#e2e8f0'/><rect x='68' y='90' width='220' height='18' rx='9' fill='#64748b'/><rect x='68' y='126' width='170' height='14' rx='7' fill='#94a3b8'/><circle cx='470' cy='190' r='84' fill='#94a3b8'/></svg>`
   ),
-  dark: toSvgDataUri(
+  deepspace: toSvgDataUri(
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 380'><rect width='640' height='380' fill='#0f172a'/><rect x='24' y='24' width='592' height='332' rx='16' fill='#1e293b'/><rect x='68' y='90' width='220' height='18' rx='9' fill='#cbd5e1'/><rect x='68' y='126' width='170' height='14' rx='7' fill='#94a3b8'/><circle cx='470' cy='190' r='84' fill='#334155'/></svg>`
   ),
   cybernoir: toSvgDataUri(

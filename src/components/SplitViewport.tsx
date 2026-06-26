@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { isDarkTheme, useSplitTransition, useTheme, type SplitMode, type Theme } from "../context/ThemeContext";
-import { NavControlsBar, NavStatusBadge, NavWindow, type SectionId } from "../sections/Nav";
+import { NavBar, NavDevControls, NavExploreControls, NavStatusBadge, NavWindow, type SectionId } from "../sections/Nav";
 import Hero from "../sections/Hero";
 import About from "../sections/About";
 import Work from "../sections/Work";
 import Process from "../sections/Process";
 import Contact from "../sections/Contact";
+import { AnimatePresence, motion } from "motion/react";
 
 type ThemedSectionProps = { theme: Theme; right?: boolean };
 
@@ -69,15 +70,17 @@ const applyClipPath = (
 
 function SplitHandle({
   onPointerDown,
-  lineRef,
   dominantTheme,
 }: {
-  onPointerDown: (e: React.PointerEvent) => void;
-  lineRef: React.RefObject<HTMLDivElement | null>;
+  onPointerDown?: (e: React.PointerEvent) => void;
   dominantTheme: Theme;
 }) {
+
+
   const { splitMode, splitAngleDeg, transitionRef } = useSplitTransition();
   const isDark = isDarkTheme(dominantTheme);
+  const lineRef = useRef<HTMLDivElement>(null);
+
   const effectiveSplitX = Math.max(
     20,
     Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
@@ -135,7 +138,7 @@ export default function SplitViewport() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
   const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 800);
-  const { themeLeft, themeRight, dominantTheme, devMode } = useTheme();
+  const { themeLeft, themeRight, dominantTheme, devMode, exploreMode } = useTheme();
   const { setTransition, splitMode, splitAngleDeg, themeRightOpacity,transitionRef } = useSplitTransition();
 
   const appRootRef = useRef<HTMLDivElement>(null);
@@ -308,6 +311,8 @@ export default function SplitViewport() {
       {SECTIONS.map((section, index) => (
         <div key={section.id} ref={(element) => { outerRefs.current[index] = element; }} className="h-screen" />
       ))}
+      {/* Add extra spacer at the end for phone */}
+      <div className="h-[120vh] lg:h-0" />
     </div>
   ), []);
 
@@ -315,7 +320,7 @@ export default function SplitViewport() {
     <div ref={appRootRef} className="relative" style={{ "--scroll-y": "0px" } as React.CSSProperties}>
       <div className="fixed inset-0 pointer-events-none z-150">
         <div className="px-2 pt-2 lg:px-10 lg:pt-10">
-          <NavControlsBar
+          <NavBar
             dominantTheme={dominantTheme}
             isMenuOpen={isMenuOpen}
             onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
@@ -373,14 +378,46 @@ export default function SplitViewport() {
       </div>
 
       {spacerElement}
+      <AnimatePresence>
+        {devMode && (
+          <>
+            <SplitHandle
+              key="dev-split-handle"
+              onPointerDown={onPointerDown}
+              dominantTheme={dominantTheme}
+            />
+            <div className="fixed overflow-hidden bottom-2 lg:bottom-10 left-0 right-0 mx-2 lg:mx-10 h-12 rounded-b-xl lg:rounded-b-2xl z-100 pointer-events-none">
+              <motion.div key="devcontrols" initial={{y:64}} animate={{y: 0}} transition={{ ease: "circOut" }} className="h-full w-full pointer-events-auto">
+                <NavDevControls
+                  dominantTheme={dominantTheme}
+                  isMenuOpen={isMenuOpen}
+                  onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+                />
+              </motion.div>
 
-      {devMode && (
-        <SplitHandle
-          onPointerDown={onPointerDown}
-          lineRef={splitLineRef}
-          dominantTheme={dominantTheme}
-        />
-      )}
+            </div>
+          </>
+        )}
+        {exploreMode && (
+          <>
+            {(splitMode === "vertical" || splitMode === "horizontal" || splitMode === "angled") && (
+              <SplitHandle
+                dominantTheme={dominantTheme}
+              />
+            )}
+            <div className="fixed overflow-hidden bottom-2 lg:bottom-10 left-0 right-0 mx-2 lg:mx-10 h-12 rounded-b-xl lg:rounded-b-2xl z-100 pointer-events-none">
+              <motion.div key="controls" initial={{y:64}} animate={{y: 0}} transition={{ ease: "circOut" }} className="h-full w-full pointer-events-auto">
+                <NavExploreControls
+                  dominantTheme={dominantTheme}
+                  isMenuOpen={isMenuOpen}
+                  onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+                />
+              </motion.div>
+
+            </div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

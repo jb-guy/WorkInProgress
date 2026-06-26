@@ -9,7 +9,7 @@
   --tertiary-color: #ff00ff;
   --muted-color: #D9DEFF;
 
-  --theme-bg: var(--dark);
+  --theme-bg: var(--muted-color);
 
   --theme-title-color: var(--dark);
   --theme-title-font: "Inter", "Segoe UI", sans-serif;

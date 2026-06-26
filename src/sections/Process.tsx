@@ -29,14 +29,14 @@ const items = [
   },
   {
     id: "4",
-    title: "Visual Systems",
+    title: <p>Visual <br /> Systems</p>,
     keyPhrase: "Visual coherence enhances immersion.",
     description: "Creating cohesive visual languages and aesthetics that enhance the overall experience and reinforce the narrative.",
     keyWords: ["Visual Language", "Aesthetics", "Cohesion", "Reinforcement"],
   },
   {
     id: "5",
-    title: "Motion & Interaction",
+    title: <p>Motion & <br /> Interaction</p>,
     keyPhrase: "Movement brings interfaces to life.",
     description: "Designing animations and interactions that guide users and enhance the overall experience.",
     keyWords: ["Animation", "Interaction Design", "User Guidance", "Experience Enhancement"],
@@ -108,11 +108,11 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
       Development Process
     </h2>
 
-    <div className="lg:h-16 lg:gap-4 p-2 lg:ml-4 mb-6 flex justify-around lg:justify-start ">
-      {items.map((item) => (
+    <div className="lg:h-24 lg:gap-4 p-2 lg:ml-4 mb-6 flex justify-around lg:justify-start ">
+      {items.map((item, index) => (
         <button
           key={item.id}
-          className={`size-12 lg:size-auto bg-stone-800/20 px-2 text-light border border-light/100 rounded-full! lg:rounded-xl! text-xs  ${activeItemId === item.id ? "border-lime-400!" : ""}`}
+          className={`size-12 lg:size-auto lg:px-6 lg:py-3 bg-stone-800/40 px-2 text-light/80 hover:text-white border border-light/100 rounded-full! lg:rounded-xl! text-xs lg:text-sm transition-shadow duration-500 ${step === index ? "border-lime-400! shadow-lime-400 shadow-md text-white" : ""}`}
           onClick={() => setActiveItemId(item.id)}
         >
           {window.innerWidth >= 1024 ? item.title : `0${item.id}`}
@@ -121,7 +121,7 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
     </div>
     
     <div className="h-full w-full">
-      <div className="h-full w-full flex flex-col lg:flex-row">
+      <div className="h-full w-full flex flex-col-reverse lg:flex-row">
         <div className="lg:h-full lg:grow theme-spacer"/>
         <div className="lg:order-first lg:w-7/20 theme-card backdrop-blur-xl mix-blend-normal will-change-transform flex flex-col justify-center text-left">
           <h3 className="theme-title mx-5 text-3xl font-bold leading-none tracking-tight lg:text-5xl">

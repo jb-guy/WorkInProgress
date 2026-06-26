@@ -59,7 +59,7 @@ const SceneDark = () => {
 };
 
 const SceneByTheme = ({ theme, resolution, mousePos }: { theme: Theme, resolution: { x: number, y: number }, mousePos: { x: number, y: number } }) => {
-  if (theme === "dark") return <SceneDark />;
+  if (theme === "deepspace") return <SceneDark />;
   if (theme === "holographic") return <HolographicBackground resolution={resolution} mousePos={mousePos} />;
   return <SceneWireframe />;
 };

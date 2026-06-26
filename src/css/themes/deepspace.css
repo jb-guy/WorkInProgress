@@ -1,4 +1,4 @@
-[data-theme="cybernoir"] {
+[data-theme="dark"] {
 
   --light: #f3f4f6;
   --dark: #000b1e;
@@ -31,15 +31,4 @@
   --theme-button-letter-spacing: 0.1em;
 
   --theme-bg: var(--dark);
-}
-
-[data-theme="cybernoir"] .theme-card {
-  box-shadow: 0 0 10px 5px var(--primary-color);
-}
-
-[data-theme="cybernoir"] h1::after,
-[data-theme="cybernoir"] h2::after {
-  position: absolute;
-  color: var(--primary-color);
-  content: "_";
 }
