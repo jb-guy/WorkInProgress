@@ -69,15 +69,13 @@ const applyClipPath = (
 };
 
 function SplitHandle({
-  onPointerDown,
   dominantTheme,
 }: {
-  onPointerDown?: (e: React.PointerEvent) => void;
   dominantTheme: Theme;
 }) {
 
 
-  const { splitMode, splitAngleDeg, transitionRef } = useSplitTransition();
+  const { splitMode, splitAngleDeg, transitionRef, setTransition } = useSplitTransition();
   const isDark = isDarkTheme(dominantTheme);
   const lineRef = useRef<HTMLDivElement>(null);
 
@@ -116,10 +114,66 @@ function SplitHandle({
 
   const cursorClass = splitMode === "horizontal" ? "cursor-ns-resize" : "cursor-ew-resize";
 
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>|React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const onPointerMove = (moveEvent: PointerEvent|TouchEvent) => {
+      const newTransition =
+        splitMode === "horizontal"
+          ? 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY) / (typeof window !== "undefined" ? window.innerHeight : 760)
+          : 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX) / (typeof window !== "undefined" ? window.innerWidth : 1160);
+      setTransition(Math.max(0, Math.min(1, newTransition)));
+    };
+
+    const onPointerUp = () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("touchmove", onPointerMove);
+      document.removeEventListener("touchend", onPointerUp);
+    };
+
+    document.addEventListener("pointermove", onPointerMove);
+    document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("touchmove", onPointerMove);
+    document.addEventListener("touchend", onPointerUp);
+  };
+
+  useEffect(() => {
+    const updateLinePosition = () => {
+      if (!lineRef.current) return;
+      const effectiveSplitX = Math.max(
+        20,
+        Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
+      );
+      const effectiveSplitY = Math.max(
+        20,
+        Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerHeight : 760), typeof window !== "undefined" ? window.innerHeight - 20 : 760)
+      );
+
+      if (splitMode === "horizontal") {
+        lineRef.current.style.top = `${effectiveSplitY}px`;
+        lineRef.current.style.left = `50%`;
+        lineRef.current.style.transform = `translate(-50%, -50%) rotate(90deg)`;
+      } else {
+        lineRef.current.style.top = `50%`;
+        lineRef.current.style.left = `${effectiveSplitX}px`;
+        lineRef.current.style.transform = `translate(-50%, -50%) rotate(${splitAngle}deg)`;
+      }
+    };
+
+    window.addEventListener("styleTransitionUpdate", updateLinePosition);
+    updateLinePosition();
+
+    return () => {
+      window.removeEventListener("styleTransitionUpdate", updateLinePosition);
+    };
+  }, [splitMode, splitAngle, transitionRef]);
+
   return (
     <div
       ref={lineRef}
       onPointerDown={onPointerDown}
+      onTouchStart={onPointerDown}
       className={`fixed z-200 flex items-center justify-center select-none ${cursorClass}`}
       style={handleStyle}
     >
@@ -383,7 +437,6 @@ export default function SplitViewport() {
           <>
             <SplitHandle
               key="dev-split-handle"
-              onPointerDown={onPointerDown}
               dominantTheme={dominantTheme}
             />
             <div className="fixed overflow-hidden bottom-2 lg:bottom-10 left-0 right-0 mx-2 lg:mx-10 h-12 rounded-b-xl lg:rounded-b-2xl z-100 pointer-events-none">
@@ -405,8 +458,8 @@ export default function SplitViewport() {
                 dominantTheme={dominantTheme}
               />
             )}
-            <div className="fixed overflow-hidden bottom-2 lg:bottom-10 left-0 right-0 mx-2 lg:mx-10 h-12 rounded-b-xl lg:rounded-b-2xl z-100 pointer-events-none">
-              <motion.div key="controls" initial={{y:64}} animate={{y: 0}} transition={{ ease: "circOut" }} className="h-full w-full pointer-events-auto">
+            <div className="fixed overflow-hidden bottom-2 lg:bottom-10 left-0 right-0 mx-2 lg:mx-10 h-24 lg:h-12 rounded-b-xl lg:rounded-b-2xl z-100 pointer-events-none">
+              <motion.div key="controls" initial={{y:"100%"}} animate={{y: 0}} transition={{ ease: "circOut" }} className="h-full w-full pointer-events-auto">
                 <NavExploreControls
                   dominantTheme={dominantTheme}
                   isMenuOpen={isMenuOpen}

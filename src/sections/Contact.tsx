@@ -5,7 +5,7 @@ import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 const ContactOuterContent = ({ theme }: { theme: Theme }) => {
   const outerRef = useRef<HTMLDivElement>(null);
-  const { setDominantTheme } = useTheme();
+  const { setDominantTheme, exploreMode } = useTheme();
 
   const { scrollYProgress } = useScroll({
     target: outerRef,
@@ -14,14 +14,15 @@ const ContactOuterContent = ({ theme }: { theme: Theme }) => {
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
 
-    if (latest > 0.5) setDominantTheme("deepspace");
+    if (latest > 0.5 && !exploreMode) setDominantTheme("deepspace");
+    if (latest <= 0.5 && !exploreMode) setDominantTheme("dreamscape");
   });
   
   return (
   <div ref={outerRef} className="relative z-20 theme-bg h-screen w-full overflow-show">
     {theme != "wireframe" && (
       <motion.div style={{opacity: scrollYProgress}} className="absolute inset-0 z-10 ">
-        <div className="absolute w-full h-[200vh] top-[-100vh] bg-black -z-5"></div>
+        <div className="absolute w-full h-[250vh] top-[-100vh] bg-black -z-5"></div>
 
         <div className="star-field bottom-0 h-1/2">
           <div className="layer"></div>
@@ -85,7 +86,7 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
         <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-button">
           Visit my LinkedIn
         </button>
-        <button onClick={() => {queueSceneUpdate({splitMode: "mouse"}); setExploreMode(true);}} className="theme-button">
+        <button onClick={() => {if(window.innerWidth >= 768) {queueSceneUpdate({splitMode: "mouse"});} setExploreMode(true);}} className="theme-button">
           Behind the scenes
         </button>
       </div>
