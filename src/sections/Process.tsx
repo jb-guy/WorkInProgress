@@ -1,9 +1,11 @@
-import { use, useState, useRef, useMemo, memo } from "react";
+import { use, useState, useRef, useMemo, memo, lazy, Suspense } from "react";
 import { useTheme, type Theme } from "../context/ThemeContext";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
-import KoiCatScene from "../three/KoiCatScene";
 import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
+import { SceneLoadingFallback } from "../components/SceneLoadingFallback";
+
+const KoiCatScene = lazy(() => import("../three/KoiCatScene"));
 
 const items = [
   {
@@ -29,14 +31,14 @@ const items = [
   },
   {
     id: "4",
-    title: <p>Visual <br /> Systems</p>,
+    title: <span>Visual <br /> Systems</span>,
     keyPhrase: "Visual coherence enhances immersion.",
     description: "Creating cohesive visual languages and aesthetics that enhance the overall experience and reinforce the narrative.",
     keyWords: ["Visual Language", "Aesthetics", "Cohesion", "Reinforcement"],
   },
   {
     id: "5",
-    title: <p>Motion & <br /> Interaction</p>,
+    title: <span>Motion & <br /> Interaction</span>,
     keyPhrase: "Movement brings interfaces to life.",
     description: "Designing animations and interactions that guide users and enhance the overall experience.",
     keyWords: ["Animation", "Interaction Design", "User Guidance", "Experience Enhancement"],
@@ -63,7 +65,11 @@ const ProcessOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }
   <div className="process-theme z-5 theme-bg relative h-screen w-full">
     {theme == "dreamscape" && <img src="/processpotionvertical.png" alt="Process Background" className="absolute w-full h-2/1 scale-100 -translate-y-2/5 object-cover"/>}
     <div className="absolute inset-0 lg:translate-x-2/10 lg:translate-y-1/10">
-      {!right &&<KoiCatScene step={step} visible={theme == "dreamscape"}/>}
+      {!right && (
+        <Suspense fallback={<SceneLoadingFallback height="h-screen" />}>
+          <KoiCatScene step={step} visible={theme == "dreamscape"}/>
+        </Suspense>
+      )}
     </div>
   </div>
 )};
@@ -115,7 +121,8 @@ const ProcessInnerContent = ({ theme, right }: { theme: Theme, right?: boolean }
           className={`size-12 lg:size-auto lg:px-6 lg:py-3 bg-stone-800/40 px-2 text-light/80 hover:text-white border border-light/100 rounded-full! lg:rounded-xl! text-xs lg:text-sm transition-shadow duration-500 ${step === index ? "border-lime-400! shadow-lime-400 shadow-md text-white" : ""}`}
           onClick={() => setActiveItemId(item.id)}
         >
-          {window.innerWidth >= 1024 ? item.title : `0${item.id}`}
+          <p className="md:hidden">{`0${item.id}`}</p>
+          <p className="hidden md:block">{item.title}</p> 
         </button>
       ))}
     </div>

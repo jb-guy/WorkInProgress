@@ -12,7 +12,9 @@ interface ThemeContextValue {
   devMode?: boolean;
   exploreMode?: boolean;
   dominantTheme: Theme;
+  dominantThemeOverride?: boolean;
   setDominantTheme: (theme: Theme) => void;
+  setDominantThemeOverride: (override: boolean) => void;
   setThemeLeft: (t: Theme) => void;
   setThemeRight: (t: Theme) => void;
   setDevMode: (dev: boolean) => void;
@@ -28,18 +30,20 @@ interface SplitTransitionContextValue {
   setSplitMode: (mode: SplitMode) => void;
   setSplitAngleDeg: (angle: number) => void;
   setThemeRightOpacity: (opacity: number) => void;
-  onTransitionUpdate?: (callback: ()=>{}) => void;
+  onTransitionUpdate?: (callback: () => void) => () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   themeLeft: "wireframe",
   themeRight: "wireframe",
   dominantTheme: "wireframe",
+  dominantThemeOverride: false,
   devMode: false,
   exploreMode: false,
   setThemeLeft: () => {},
   setThemeRight: () => {},
   setDominantTheme: () => {},
+  setDominantThemeOverride: () => {},
   setDevMode: () => {},
   setExploreMode: () => {},
 });
@@ -53,18 +57,22 @@ const SplitTransitionContext = createContext<SplitTransitionContextValue>({
   setSplitMode: () => {},
   setSplitAngleDeg: () => {},
   setThemeRightOpacity: () => {},
-  onTransitionUpdate: () => {},
+  onTransitionUpdate: () => () => {},
 });
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [themeLeft, setThemeLeft] = useState<Theme>("wireframe");
   const [themeRight, setThemeRight] = useState<Theme>("wireframe");
   const [dominantTheme, setDominantTheme] = useState<Theme>("wireframe");
+  const [dominantThemeOverride, setDominantThemeOverride] = useState<boolean>(false);
   const transitionRef = useRef(0);
 
-  const onTransitionUpdate = (callback: ()=>{}) => {
+  const onTransitionUpdate = useCallback((callback: () => void) => {
     window.addEventListener("styleTransitionUpdate", callback);
-  }
+    return () => {
+      window.removeEventListener("styleTransitionUpdate", callback);
+    };
+  }, []);
 
   const setTransition = useCallback((x: number) => {
     transitionRef.current = x;
@@ -83,12 +91,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         themeLeft,
         themeRight,
         dominantTheme,
+        dominantThemeOverride,
         devMode,
         exploreMode,
         setThemeLeft,
         setThemeRight,
         setDevMode,
         setDominantTheme,
+        setDominantThemeOverride,
         setExploreMode,
       }}
     >

@@ -58,7 +58,7 @@ const SceneDark = () => {
   );
 };
 
-const SceneByTheme = ({ theme, resolution, mousePos }: { theme: Theme, resolution: { x: number, y: number }, mousePos: { x: number, y: number } }) => {
+const SceneByTheme = ({ theme, resolution, mousePos }: { theme: Theme, resolution: { x: number, y: number }, mousePos: React.RefObject<{ x: number, y: number }> }) => {
   if (theme === "deepspace") return <SceneDark />;
   if (theme === "holographic") return <HolographicBackground resolution={resolution} mousePos={mousePos} />;
   return <SceneWireframe />;
@@ -121,7 +121,7 @@ const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play:
 
 
   const canvaRef = useRef<HTMLCanvasElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const mousePos = useRef({ x: 0.5, y: 0.5 });
   const [resolution, setResolution] = useState({ x: 100, y: 100 });
 
 
@@ -142,7 +142,7 @@ const HeroThemeScene = ({ theme, play, mouseReact=false }: { theme: Theme, play:
       const rect = canva.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = 1.0 - (e.clientY - rect.top) / rect.height;
-      setMousePos({ x, y });
+      mousePos.current = { x, y };
     }
 
     if (mouseReact) {

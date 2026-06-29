@@ -66,9 +66,6 @@ const useKoiCatModel = () => {
         
         // Create mixer for THIS instance
         const mixer = new THREE.AnimationMixer(clonedScene);
-        gltf.animations.forEach((clip) => {
-          mixer.clipAction(clip).play();
-        });
 
         // Find objects in cloned scene
         const objects = {
@@ -166,6 +163,13 @@ const KoiCatModel = ({step, visible}: Props) => {
        animate(lotos.scale, { x: 0.01, y: 0.01, z: 0.01 }, { duration: 0.1 });
        animate(decoration.scale, { x: 0.01, y: 0.01, z: 0.01 }, { duration: 0.1 });
        animate(environment.scale, { x: 0.01, y: 0.01, z: 0.01 }, { duration: 0.1 });
+    }
+    if (step >= 4) {
+      model.animations.forEach((clip) => {
+        model.mixer.clipAction(clip).play();
+      });
+    } else {
+      model.mixer.stopAllAction();
     }
     if (step == 5) {
       animate(all.rotation, { y: all.rotation.y + Math.PI * 2 }, { duration: 1, ease: "anticipate" });

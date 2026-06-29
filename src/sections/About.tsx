@@ -5,23 +5,26 @@ import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 import CinematicNoiseOverlay from "../components/CinematicNoiseOverlay";
 import { motion } from "motion/react";
 
-const AboutOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) => (
+const AboutOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
+
+  return (
   <div className="about-theme theme-bg relative h-[200vh] lg:h-screen w-full overflow-hidden">
-    { theme === "retro80" && (window.innerWidth > 768 ? (
-      <div>
-        <motion.img whileInView={{rotate:10, x:"35vw", y:"2vh"}} transition={{ delay: 0.7 }} className="absolute w-50 lg:w-76 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-sail.png" alt="sailing" />
-        <motion.img whileInView={{rotate:-30, x:"-35vw", y:"15vh"}} transition={{ delay: 0.9 }} className="absolute w-50 lg:w-76 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-japan.png" alt="japan" />
-        <motion.img whileInView={{rotate:-10, x:"-35vw", y:"-20vh"}} transition={{ delay: 0.5 }} className="absolute w-50 lg:w-76 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-portrait.png" alt="portrait" />
-      </div>
-    ):(
-      <div>
-        <motion.img whileInView={{rotate:-30, x:"-15vw", y:"-20vh"}} className="absolute w-50 lg:w-76 top-19/20 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-japan.png" alt="japan" />
-        <motion.img whileInView={{rotate:10, x:"20vw", y:"-20vh"}} className="absolute w-50 lg:w-76 top-16/20 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-sail.png" alt="sailing" />
-        <motion.img whileInView={{rotate:-10, x:"-15vw", y:"-20vh"}} className="absolute w-50 lg:w-76 top-13/20 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-portrait.png" alt="portrait" />
-      </div>
-    ))}
+    { theme === "retro80" && (
+      <>
+        <div className="hidden md:block">
+          <motion.img whileInView={{rotate:10, x:"35vw", y:"2vh"}} transition={{ delay: 0.7 }} className="absolute w-50 lg:w-76 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-sail.png" alt="sailing" />
+          <motion.img whileInView={{rotate:-30, x:"-35vw", y:"15vh"}} transition={{ delay: 0.9 }} className="absolute w-50 lg:w-76 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-japan.png" alt="japan" />
+          <motion.img whileInView={{rotate:-10, x:"-35vw", y:"-20vh"}} transition={{ delay: 0.5 }} className="absolute w-50 lg:w-76 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-portrait.png" alt="portrait" />
+        </div>
+        <div className="md:hidden">
+          <motion.img whileInView={{rotate:-30, x:"-15vw", y:"-20vh"}} className="absolute w-50 lg:w-76 top-19/20 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-japan.png" alt="japan" />
+          <motion.img whileInView={{rotate:10, x:"20vw", y:"-20vh"}} className="absolute w-50 lg:w-76 top-16/20 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-sail.png" alt="sailing" />
+          <motion.img whileInView={{rotate:-10, x:"-15vw", y:"-20vh"}} className="absolute w-50 lg:w-76 top-13/20 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="/kodak-portrait.png" alt="portrait" />
+        </div>
+      </>
+    )}
   </div>
-);
+)};
 
 const AboutInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -43,7 +46,7 @@ const AboutInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) 
       themeRight: "retro80",
       splitMode: "horizontal",
       transition: latest,
-      themeRightOpacity: latest,
+      // themeRightOpacity: latest,
     });
   });
 
@@ -61,8 +64,8 @@ const AboutInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) 
         </h2>
         {theme === "retro80" && (
           <CinematicNoiseOverlay
-            intensity={0.22}
-            artifactIntensity={0.4}
+            intensity={0.32}
+            artifactIntensity={0.5}
             fps={18}
             className="absolute inset-0"
           />

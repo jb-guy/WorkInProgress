@@ -33,6 +33,11 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 
+.split-viewport .scrolling-container {
+  will-change: transform;
+  transform: translate3d(0, var(--scroll-y, 0px), 0);
+}
+
 .crossed {
   background:
     linear-gradient(to top left,

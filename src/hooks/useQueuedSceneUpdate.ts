@@ -14,7 +14,7 @@ export type SceneUpdate = {
 const lastTransitionDetails = {current: null as SceneUpdate | null};
 
 export const useQueuedSceneUpdate = () => {
-  const { devMode, exploreMode, setThemeRight, setThemeLeft, dominantTheme, setDominantTheme } = useTheme();
+  const { devMode, exploreMode, setThemeRight, setThemeLeft, dominantThemeOverride, setDominantTheme } = useTheme();
   const {
     setSplitMode,
     setSplitAngleDeg,
@@ -24,8 +24,7 @@ export const useQueuedSceneUpdate = () => {
 
   const rafRef = useRef<number | null>(null);
   const pendingUpdateRef = useRef<SceneUpdate | null>(null);
-  const lastUpdateTimeRef = useRef<number>(0);
-  const lastDominantThemeRef = useRef<string>("left");
+  const lastDominantThemeRef = useRef<string>("wireframe");
 
   const queueSceneUpdate = useCallback((update: SceneUpdate) => {
     if (devMode || exploreMode) return;
@@ -41,8 +40,31 @@ export const useQueuedSceneUpdate = () => {
       pendingUpdateRef.current = null;
       if (!next) return;
 
-      lastUpdateTimeRef.current = Date.now();
+      let dominantTheme = null;
+
+      if (next.transition !== undefined && next.transition !== lastTransitionDetails.current?.transition) {
+        setTransition(next.transition);
+        const leftTheme = next.themeLeft || lastTransitionDetails.current?.themeLeft || "wireframe";
+        const rightTheme = next.themeRight || lastTransitionDetails.current?.themeRight || "wireframe";
+        if (!dominantThemeOverride && next.transition < 0.5 && lastDominantThemeRef.current !== leftTheme) {
+          dominantTheme = leftTheme;
+        } else if (!dominantThemeOverride && next.transition >= 0.5 && lastDominantThemeRef.current !== rightTheme) {
+          dominantTheme = rightTheme;
+        }
+      }
+
+      const shouldUpdate =
+        (next.themeRight && next.themeRight !== lastTransitionDetails.current?.themeRight) ||
+        (next.themeLeft && next.themeLeft !== lastTransitionDetails.current?.themeLeft) ||
+        (next.splitMode && next.splitMode !== lastTransitionDetails.current?.splitMode) ||
+        (next.splitAngleDeg !== undefined && next.splitAngleDeg !== lastTransitionDetails.current?.splitAngleDeg) ||
+        (next.themeRightOpacity !== undefined && next.themeRightOpacity !== lastTransitionDetails.current?.themeRightOpacity) ||
+        dominantTheme;
+
+      if (!shouldUpdate) return;
+      
       flushSync(() => {
+        console.log("Updating scene with:", next);
         if (next.themeRight && next.themeRight !== lastTransitionDetails.current?.themeRight) {
           setThemeRight(next.themeRight);
         }
@@ -58,22 +80,17 @@ export const useQueuedSceneUpdate = () => {
         if (next.themeRightOpacity !== undefined && next.themeRightOpacity !== lastTransitionDetails.current?.themeRightOpacity) {
           setThemeRightOpacity(next.themeRightOpacity);
         }
-        if (next.transition !== undefined && next.transition !== lastTransitionDetails.current?.transition) {
-          setTransition(next.transition);
-          if (dominantTheme != "deepspace" && next.transition < 0.5 && lastDominantThemeRef.current !== dominantTheme) {
-            setDominantTheme(next.themeLeft || lastTransitionDetails.current?.themeLeft || dominantTheme);
-          } else if (dominantTheme != "deepspace" && next.transition >= 0.5 && lastDominantThemeRef.current !== dominantTheme) {
-            setDominantTheme(next.themeRight || lastTransitionDetails.current?.themeRight || dominantTheme);
-          }
+        if (dominantTheme && dominantTheme !== lastDominantThemeRef.current) {
+          setDominantTheme(dominantTheme);
+          lastDominantThemeRef.current = dominantTheme;
         }
       });
       lastTransitionDetails.current = { ...lastTransitionDetails.current, ...next };
     });
-  }, [devMode, exploreMode, dominantTheme, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
+  }, [devMode, exploreMode, dominantThemeOverride, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
 
   /*useEffect(() => {
     return () => {
-      console.log("Cleaning up scene update hook");
       if (rafRef.current !== null) {
         window.cancelAnimationFrame(rafRef.current);
       }

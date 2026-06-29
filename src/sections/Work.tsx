@@ -1,11 +1,14 @@
 import type { Theme } from "../context/ThemeContext";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
 import SphereMenu from "../three/SphereMenu";
-import ShaderBackground, { preloadTextures } from "../three/ShaderBackground"
-import { useEffect, useMemo, useRef, useState } from "react";
+import { preloadTextures } from "../three/ShaderBackground"
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll } from "motion/react";
 import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 import Carousel from "../components/Carousel";
+import { SceneLoadingFallback } from "../components/SceneLoadingFallback";
+
+const ShaderBackground = lazy(() => import("../three/ShaderBackground").then(module => ({ default: module.default })));
 
 const toSvgDataUri = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 const WORK_SECTION_ID = "work";
@@ -88,7 +91,9 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
         {theme === "cybernoir" && (
           <img src="/cyberworkbg.png" alt="cybernoir theme overlay" className="absolute size-full scale-120 -top-60 left-1 lg:-top-11 object-none object-[50%_44%] lg:object-[50%_60%] pointer-events-none" />
         )}
-        <ShaderBackground image={displayImage} progress={progress} className="-mt-15 lg:mt-25" />
+        <Suspense fallback={<SceneLoadingFallback height="h-full" />}>
+          <ShaderBackground image={displayImage} progress={progress} className="-mt-15 lg:mt-25" />
+        </Suspense>
       </div>
     </div>
   );

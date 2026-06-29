@@ -3,6 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- TIER 1: Preload critical assets for early sections -->
+    <!-- Kodak images (About section) -->
+    <link rel="preload" as="image" href="/kodak-sail.png" type="image/png" />
+    <link rel="preload" as="image" href="/kodak-japan.png" type="image/png" />
+    <link rel="preload" as="image" href="/kodak-portrait.png" type="image/png" />
+    
+    <!-- Work section backgrounds (carousel items) -->
+    <link rel="preload" as="image" href="/zentbg.png" type="image/png" />
+    <link rel="preload" as="image" href="/simnav.png" type="image/png" />
+    <link rel="preload" as="image" href="/artist.png" type="image/png" />
+    <link rel="preload" as="image" href="/boutdumonde.png" type="image/png" />
+    
+    <!-- TIER 2: Prefetch non-critical assets (large GLTF + secondary images) -->
+    <!-- GLTF model for Process section (large, loads in background) -->
+    <link rel="prefetch" href="/koi_cat/scene.glb" as="fetch" crossorigin />
+    
+    <!-- Secondary/overlay images -->
+    <link rel="prefetch" as="image" href="/processpotionvertical.png" type="image/png" />
+    <link rel="prefetch" as="image" href="/cyberworkbg.png" type="image/png" />
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>work-in-progress</title>
   </head>

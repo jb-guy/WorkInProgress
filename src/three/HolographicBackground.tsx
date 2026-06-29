@@ -90,7 +90,7 @@ interface HolographicBackgroundProps {
   speed?: number;
   amplitude?: number;
   mouseReact?: boolean;
-  mousePos?:{ x: number; y: number }
+  mousePos?: React.RefObject<{ x: number; y: number }>;
   resolution?:{ x: number; y: number };
 }
 
@@ -101,7 +101,7 @@ const HolographicBackground = ({
   color = [1, 1, 1],
   speed = 1.0,
   amplitude = 0.1,
-  mousePos = undefined,
+  mousePos,
   resolution = undefined,
   ...rest
 }: HolographicBackgroundProps) => {
@@ -126,16 +126,20 @@ const HolographicBackground = ({
     uResolution: {
       value: new Float32Array([resolution?.x ?? 100, resolution?.y ?? 100])
     },
-    uMouse: { value: new Float32Array([mousePos?.x ?? 0.5, mousePos?.y ?? 0.5]) },
+    uMouse: { value: new Float32Array([mousePos?.current?.x ?? 0.5, mousePos?.current?.y ?? 0.5]) },
     uAmplitude: { value: amplitude*2 },
     uSpeed: { value: speed }
-  }), [resolution, mousePos, color, amplitude, speed]);
+  }), [resolution, color, amplitude, speed]);
     
   useFrame(state => {
     if(!mesh.current || !mesh.current!.material.uniforms) return;
     const { clock } = state;
     mesh.current!.material.uniforms.uTime.value = clock.getElapsedTime()*0.5;
     sphere.current!.material.uniforms.uTime.value = clock.getElapsedTime();
+    if (mousePos) {
+      planeUniforms.uMouse.value[0] = mousePos.current.x;
+      planeUniforms.uMouse.value[1] = mousePos.current.y;
+    }
   });
 
   return (
@@ -150,7 +154,7 @@ const HolographicBackground = ({
         />
       </mesh>
       <mesh ref={sphere} position={[0, 0, 0]}>
-        <sphereGeometry args={[1, 64, 64]} />
+        <sphereGeometry args={[1, 32, 32]} />
         <shaderMaterial
           vertexShader={displacementVertexShader}
           fragmentShader={fragmentShader}

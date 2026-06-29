@@ -5,17 +5,17 @@ import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 const ContactOuterContent = ({ theme }: { theme: Theme }) => {
   const outerRef = useRef<HTMLDivElement>(null);
-  const { setDominantTheme, exploreMode } = useTheme();
+  const { setDominantTheme, setDominantThemeOverride, exploreMode } = useTheme();
 
   const { scrollYProgress } = useScroll({
     target: outerRef,
-    offset: ["30% end", "105% end"],
+    offset: ["30% end", "90% end"],
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
 
-    if (latest > 0.5 && !exploreMode) setDominantTheme("deepspace");
-    if (latest <= 0.5 && !exploreMode) setDominantTheme("dreamscape");
+    if (latest > 0.5 && !exploreMode) {setDominantTheme("deepspace"); setDominantThemeOverride(true);}
+    if (latest <= 0.5 && !exploreMode) {setDominantTheme("dreamscape"); setDominantThemeOverride(false);}
   });
   
   return (
@@ -35,12 +35,11 @@ const ContactOuterContent = ({ theme }: { theme: Theme }) => {
   </div>
 )};
 
-const phoneMultiplier = window.innerWidth < 768 ? 1.5 : 1; // Adjust this value to control the speed of the parallax effect
-
 const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { setExploreMode } = useTheme();
   const queueSceneUpdate = useQueuedSceneUpdate();
+  const phoneMultiplier = useRef(window.innerWidth < 768 ? 1.5 : 1);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -58,9 +57,19 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
       themeLeft: "dreamscape",
       themeRight: "wireframe",
       splitMode: "circle",
-      transition: latest * phoneMultiplier,
+      transition: latest * phoneMultiplier.current,
     });
   });
+
+  useEffect(() => {
+    const onResize = () => {
+      phoneMultiplier.current = window.innerWidth < 768 ? 1.5 : 1;
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
 
   return (
   <div ref={sectionRef} className="contact-theme relative flex h-screen w-full flex-col py-30">
@@ -80,13 +89,13 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
         <p className="theme-text mt-6 max-w-xl text-center text-sm">
           Whether you have a question, a project idea or just want to say hi, feel free to reach out.
         </p>
-        <button onClick={() => window.location.href = "mailto:jeanbaptiste.guy2358@gmail.com"} className="theme-button mt-6">
+        <button onClick={() => window.location.href = "mailto:jeanbaptiste.guy2358@gmail.com"} className="theme-button mt-10">
           Send me an email
         </button>
-        <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-button">
+        <button onClick={() => window.open("https://www.linkedin.com/in/your-profile", "_blank")} className="theme-button mt-4">
           Visit my LinkedIn
         </button>
-        <button onClick={() => {if(window.innerWidth >= 768) {queueSceneUpdate({splitMode: "mouse"});} setExploreMode(true);}} className="theme-button">
+        <button onClick={() => {if(window.innerWidth >= 768) {queueSceneUpdate({splitMode: "mouse"});} setExploreMode(true);}} className="theme-button mt-4">
           Behind the scenes
         </button>
       </div>

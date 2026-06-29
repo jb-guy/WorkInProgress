@@ -209,6 +209,11 @@ export default function SplitViewport() {
   const splitLineRef = useRef<HTMLDivElement>(null);
   const scrollRafRef = useRef<number | null>(null);
 
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
+
   // Handle scroll to section from menu
   const handleSectionClick = useCallback((sectionId: SectionId) => {
     const sectionIndex = SECTIONS.findIndex((s) => s.id === sectionId);
@@ -222,9 +227,10 @@ export default function SplitViewport() {
 
     // Close menu after a brief delay to ensure scroll starts
     setTimeout(() => {
-      setIsMenuOpen(false);
+      closeMenu();
     }, 100);
   }, []);
+
 
   const updateRootClips = useCallback(() => {
     applyClipPath(outerRightClipRef.current, splitMode, splitAngleDeg, transitionRef.current, themeRightOpacity);
@@ -276,18 +282,15 @@ export default function SplitViewport() {
   }, []);
 
   useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
+      document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
+    }
     if (splitMode === "mouse") {
-      document.addEventListener("mousemove", (e) => {
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-        document.documentElement.style.setProperty("--mouse-x", `${mouseX}px`);
-        document.documentElement.style.setProperty("--mouse-y", `${mouseY}px`);
-      });
+      document.addEventListener("mousemove", onMouseMove);
     }
     return () => {
-      if (splitMode === "mouse") {
-        document.removeEventListener("mousemove", () => {});
-      }
+      document.removeEventListener("mousemove", onMouseMove);
     };
   }, [splitMode]);
 
@@ -371,7 +374,7 @@ export default function SplitViewport() {
   ), []);
 
   return (
-    <div ref={appRootRef} className="relative" style={{ "--scroll-y": "0px" } as React.CSSProperties}>
+    <div ref={appRootRef} className="relative split-viewport" style={{ "--scroll-y": "0px" } as React.CSSProperties}>
       <div className="fixed inset-0 pointer-events-none z-150">
         <div className="px-2 pt-2 lg:px-10 lg:pt-10">
           <NavBar
@@ -385,7 +388,7 @@ export default function SplitViewport() {
 
       <div className="fixed inset-0 pointer-events-auto">
         <div ref={outerLeftClipRef} className="absolute inset-0 overflow-hidden" data-theme={themeLeft}>
-          <div ref={outerLeftStackRef} className="w-full will-change-scroll">
+          <div ref={outerLeftStackRef} className="w-full scrolling-container will-change-transform">
             {outerLeftSections}
           </div>
         </div>
@@ -396,11 +399,11 @@ export default function SplitViewport() {
           <NavWindow
             dominantTheme={themeLeft}
             isMenuOpen={isMenuOpen}
-            onMenuClose={() => setIsMenuOpen(false)}
+            onMenuClose={closeMenu}
             activeSection={activeSection}
             onSectionClick={handleSectionClick}
           >
-            <div ref={innerLeftStackRef} className="w-full will-change-scroll">
+            <div ref={innerLeftStackRef} className="w-full scrolling-container will-change-transform">
               {innerLeftSections}
             </div>
           </NavWindow>
@@ -409,7 +412,7 @@ export default function SplitViewport() {
 
       <div className="fixed inset-0 pointer-events-none">
         <div ref={outerRightClipRef} className="absolute inset-0 overflow-hidden will-change-transform" data-theme={themeRight}>
-          <div ref={outerRightStackRef} className="w-full will-change-scroll">
+          <div ref={outerRightStackRef} className="w-full scrolling-container will-change-transform">
             {outerRightSections}
           </div>
         </div>
@@ -420,11 +423,11 @@ export default function SplitViewport() {
           <NavWindow
             dominantTheme={themeRight}
             isMenuOpen={isMenuOpen}
-            onMenuClose={() => setIsMenuOpen(false)}
+            onMenuClose={closeMenu}
             activeSection={activeSection}
             onSectionClick={handleSectionClick}
           >
-            <div ref={innerRightStackRef} className="w-full will-change-scroll">
+            <div ref={innerRightStackRef} className="w-full scrolling-container will-change-transform">
               {innerRightSections}
             </div>
           </NavWindow>
@@ -443,8 +446,6 @@ export default function SplitViewport() {
               <motion.div key="devcontrols" initial={{y:64}} animate={{y: 0}} transition={{ ease: "circOut" }} className="h-full w-full pointer-events-auto">
                 <NavDevControls
                   dominantTheme={dominantTheme}
-                  isMenuOpen={isMenuOpen}
-                  onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
                 />
               </motion.div>
 
@@ -462,8 +463,6 @@ export default function SplitViewport() {
               <motion.div key="controls" initial={{y:"100%"}} animate={{y: 0}} transition={{ ease: "circOut" }} className="h-full w-full pointer-events-auto">
                 <NavExploreControls
                   dominantTheme={dominantTheme}
-                  isMenuOpen={isMenuOpen}
-                  onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
                 />
               </motion.div>
 

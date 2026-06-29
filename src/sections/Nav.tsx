@@ -9,7 +9,7 @@ import {
   type Theme,
 } from "../context/ThemeContext";
 import { SectionMenu } from "../components/SectionMenu";
-import {motion, useScroll} from "motion/react"
+import {AnimatePresence, motion, useScroll} from "motion/react"
 
 export type SectionId = "hero" | "about" | "process" | "work" | "contact";
 
@@ -287,7 +287,7 @@ export const NavStatusBadge = ({ activeSection, dominantTheme }: NavStatusProps)
 
   return (
     <div className={`absolute top-14 right-2 lg:top-22 lg:right-10 border-b border-l w-36 text-[0.6rem] p-1 z-10 pointer-events-none ${separatorClass} ${subtleClass}`}>
-      SYSTEM STATUS: UNSTABLE <br />
+      SYSTEM: UNSTABLE <br />
       INITIALIZING: {activeLabel} <br />
       BUILD: {dominantTheme.toUpperCase()}
     </div>
@@ -308,14 +308,14 @@ export const NavWindow = ({
     <div className="h-screen w-full fixed p-2 lg:p-10 pt-14 lg:pt-22 pointer-events-none">
       <div className={`h-full w-full border border-t-0 rounded-b-xl lg:rounded-b-2xl overflow-hidden pointer-events-none ${frameClass} transition-colors relative`}>
         {onMenuClose && onSectionClick && (
-          <SectionMenu
-            isOpen={isMenuOpen}
-            onClose={onMenuClose}
-            activeSection={activeSection}
-            onSectionClick={onSectionClick}
-            dominantTheme={dominantTheme}
-            frameClass={frameClass}
-          />
+            <SectionMenu
+              isOpen={isMenuOpen}
+              onClose={onMenuClose}
+              activeSection={activeSection}
+              onSectionClick={onSectionClick}
+              dominantTheme={dominantTheme}
+              frameClass={frameClass}
+            />
         )}
         <div className="h-screen w-full -mt-14 lg:-mt-22">{children}</div>
       </div>

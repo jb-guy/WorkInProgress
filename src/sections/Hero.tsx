@@ -1,10 +1,12 @@
 import { animate, useInView } from "motion/react";
 import type { Theme } from "../context/ThemeContext";
 import { useTheme } from "../context/ThemeContext";
-import HeroThemeScene from "../three/HeroThemeScene";
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 import { motion } from "motion/react";
+import { SceneLoadingFallback } from "../components/SceneLoadingFallback";
+
+const HeroThemeScene = lazy(() => import("../three/HeroThemeScene"));
 
 
 const HeroOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) => {
@@ -15,7 +17,9 @@ const HeroOuterContent = ({ theme, right }: { theme: Theme, right?: boolean }) =
     <div
       className="h-full w-full"
     >
-      <HeroThemeScene theme={theme} play={inView}/>
+      <Suspense fallback={<SceneLoadingFallback height="h-full" />}>
+        <HeroThemeScene theme={theme} play={inView}/>
+      </Suspense>
       {theme === "wireframe" && (
       <div className="absolute theme-sub pb-20 inset-0 w-full h-full pointer-events-none flex items-center justify-center">
         <motion.p animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 1, repeat: Infinity }} className="text-[5vw]">LOADING COLORS...</motion.p>
