@@ -83,7 +83,7 @@ const getPalette = (theme: Theme) => {
       : "border-stone-900/30 text-stone-900 bg-white/40",
     subtleClass: darkChrome ? "text-white/70" : "text-stone-700/85",
     selectClass: darkChrome ? "text-white/90 bg-black/25" : "text-stone-900 bg-white/65",
-    svgFill: darkChrome ? "fill-white/90" : "fill-stone-900/90",
+    svgFill: darkChrome ? "fill-white/90 stroke-white/90" : "fill-stone-900/90 stroke-stone-900/90",
   };
 };
 
@@ -134,7 +134,7 @@ export const NavExploreControls = ({ dominantTheme, isMenuOpen, onMenuToggle }: 
   } = useTheme();
   const { separatorClass, frameClass, svgFill } = getPalette(dominantTheme);
   return (
-    <div className={`h-full flex items-center justify-between pointer-events-auto backdrop-blur-xs ${separatorClass} border rounded-b-xl lg:rounded-b-2xl ${frameClass} overflow-hidden`}>
+    <div className={`h-full ${svgFill} flex items-center justify-between pointer-events-auto backdrop-blur-xs ${separatorClass} border rounded-b-xl lg:rounded-b-2xl ${frameClass} overflow-hidden`}>
         <div className="flex flex-col h-full lg:flex-row lg:items-center justify-center gap-2">
           <div className="flex items-center gap-1 px-2 text-[0.65rem] font-mono">
             <p className="ml-4 text-sub text-xs opacity-60">Theme:</p>
@@ -147,7 +147,7 @@ export const NavExploreControls = ({ dominantTheme, isMenuOpen, onMenuToggle }: 
               />
             ))}
           </div>
-          <div className={`flex ${svgFill} items-center gap-1 px-2 text-[0.65rem] font-mono`}>
+          <div className="flex items-center gap-1 px-2 text-[0.65rem] font-mono">
           <span className="opacity-30 hidden lg:inline text-xs">|</span>
            <p className="ml-4 text-sub text-xs opacity-60">Split:</p>
            {/* vertical button icon */}

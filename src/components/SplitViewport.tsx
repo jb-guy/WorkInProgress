@@ -87,30 +87,74 @@ function SplitHandle({
     20,
     Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerHeight : 760), typeof window !== "undefined" ? window.innerHeight - 20 : 760)
   );
-  const lineClass = isDark ? "bg-white/30" : "bg-stone-900/35";
   const pipClass = isDark ? "border-white/40 bg-white/10" : "border-stone-900/30 bg-white/80";
   const dotClass = isDark ? "bg-white/70" : "bg-stone-900/70";
 
   const splitAngle = splitMode === "angled" ? splitAngleDeg : splitMode === "horizontal" ? 90 : 0;
-  const lineStyle: React.CSSProperties = {
-    top: "50%",
-    width: "1px",
-    height: "180vh",
-    transform: `translate(-50%, -50%)`,
-  };
 
-  const handleStyle: React.CSSProperties =
-    splitMode === "horizontal"
-      ? {
-          top: effectiveSplitY,
-          left: "50%",
-          transform: "translate(-50%, -50%) rotate(90deg)",
-        }
-      : {
-          top: "50%",
-          left: effectiveSplitX,
-          transform: `translate(-50%, -50%) rotate(${splitAngle}deg)`,
-        };
+  const getHandleStyle = useCallback(() => {
+    console.log("weird", splitMode)
+    if(splitMode === "vertical"){
+      const effectiveSplitX = Math.max(
+        20,
+        Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
+      );
+      return {
+        top: `50%`,
+        left: `${effectiveSplitX}px`,
+        transform: `translate(-50%, -50%)`,
+      }
+    } else if(splitMode === "horizontal"){
+      const effectiveSplitY = Math.max(
+        20,
+        Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerHeight : 760), typeof window !== "undefined" ? window.innerHeight - 20 : 760)
+      );
+      return {
+        top: `${effectiveSplitY}px`,
+        left: `50%`,
+        transform: `translate(-50%, -50%) rotate(90deg)`,
+      }
+    } else if(splitMode === "angled"){
+      const correction = Math.tan(((splitAngleDeg) * Math.PI) / 180)*(0.5-transitionRef.current)*(window.innerHeight/window.innerWidth);
+      const effectiveSplitX = Math.max(
+        20,
+        Math.min((1-transitionRef.current+correction) * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
+      );
+      return {
+        top: `50%`,
+        left: `${effectiveSplitX}px`,
+        transform: `translate(-50%, -50%) rotate(${splitAngle}deg)`,
+      }
+    } else if (splitMode === "circle") {
+      const centerX = (typeof window !== "undefined" ? window.innerWidth : 1160) / 2;
+      const centerY = (typeof window !== "undefined" ? window.innerHeight : 760) / 2;
+      const diagonale = Math.sqrt((centerX*2) ** 2 + (centerY*2) ** 2);
+      const radius = (transitionRef.current * diagonale) / 2;
+      console.log(window.innerWidth, centerX, radius, transitionRef.current, diagonale);
+      return {
+        top: `50%`,
+        left: `${centerX + radius}px`,
+        transform: `translate(-50%, -50%)`,
+      }
+    } else if (splitMode === "square") {
+      const centerX = (typeof window !== "undefined" ? window.innerWidth : 1160) / 2;
+      const effectiveSplitX = Math.max(
+        20,
+        Math.min((transitionRef.current/2) * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
+      );
+      return {
+        top: `50%`,
+        left: `${centerX + effectiveSplitX}px`,
+        transform: `translate(-50%, -50%)`,
+      }
+    }
+
+    return {
+      top: `50%`,
+      left: `50%`,
+      transform: `translate(-50%, -50%)`,
+    }
+  }, [splitMode, effectiveSplitX, effectiveSplitY, splitAngle]);
 
   const cursorClass = splitMode === "horizontal" ? "cursor-ns-resize" : "cursor-ew-resize";
 
@@ -118,11 +162,34 @@ function SplitHandle({
     e.preventDefault();
 
     const onPointerMove = (moveEvent: PointerEvent|TouchEvent) => {
-      const newTransition =
-        splitMode === "horizontal"
-          ? 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY) / (typeof window !== "undefined" ? window.innerHeight : 760)
-          : 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX) / (typeof window !== "undefined" ? window.innerWidth : 1160);
-      setTransition(Math.max(0, Math.min(1, newTransition)));
+      if(splitMode === "horizontal") {
+        const newTransition = 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY) / (typeof window !== "undefined" ? window.innerHeight : 760);
+        setTransition(Math.max(0, Math.min(1, newTransition)));
+      } 
+      else if (splitMode === "vertical") {
+        const newTransition = 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX) / (typeof window !== "undefined" ? window.innerWidth : 1160);
+        setTransition(Math.max(0, Math.min(1, newTransition)));
+      }
+      else if (splitMode === "angled") {
+        const correction = Math.tan(((splitAngleDeg) * Math.PI) / 180)*(0.5-transitionRef.current)*(window.innerHeight/window.innerWidth);
+        const newTransition = correction + 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX) / (typeof window !== "undefined" ? window.innerWidth : 1160);
+
+        setTransition(Math.max(0, Math.min(1, newTransition)));
+      }
+      else if (splitMode === "circle") {
+        const centerX = (typeof window !== "undefined" ? window.innerWidth : 1160) / 2;
+        const centerY = (typeof window !== "undefined" ? window.innerHeight : 760) / 2;
+        const x = (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX) - centerX;
+        const y = (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY) - centerY;
+        const distance = Math.sqrt(x * x + y * y);
+        const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+        const newTransition = distance / maxDistance;
+        setTransition(Math.max(0, Math.min(1, newTransition)));
+      }
+      else if (splitMode === "square") {
+        const newTransition = Math.abs((moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX) / (typeof window !== "undefined" ? window.innerWidth : 1160) * 2 - 1 );
+        setTransition(Math.max(0, Math.min(1, newTransition)));
+      }
     };
 
     const onPointerUp = () => {
@@ -141,24 +208,11 @@ function SplitHandle({
   useEffect(() => {
     const updateLinePosition = () => {
       if (!lineRef.current) return;
-      const effectiveSplitX = Math.max(
-        20,
-        Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerWidth : 1160), typeof window !== "undefined" ? window.innerWidth - 20 : 1160)
-      );
-      const effectiveSplitY = Math.max(
-        20,
-        Math.min((1-transitionRef.current) * (typeof window !== "undefined" ? window.innerHeight : 760), typeof window !== "undefined" ? window.innerHeight - 20 : 760)
-      );
-
-      if (splitMode === "horizontal") {
-        lineRef.current.style.top = `${effectiveSplitY}px`;
-        lineRef.current.style.left = `50%`;
-        lineRef.current.style.transform = `translate(-50%, -50%) rotate(90deg)`;
-      } else {
-        lineRef.current.style.top = `50%`;
-        lineRef.current.style.left = `${effectiveSplitX}px`;
-        lineRef.current.style.transform = `translate(-50%, -50%) rotate(${splitAngle}deg)`;
-      }
+      
+      const handleStyle = getHandleStyle();
+      lineRef.current.style.top = handleStyle.top;
+      lineRef.current.style.left = handleStyle.left;
+      lineRef.current.style.transform = handleStyle.transform;
     };
 
     window.addEventListener("styleTransitionUpdate", updateLinePosition);
@@ -175,9 +229,8 @@ function SplitHandle({
       onPointerDown={onPointerDown}
       onTouchStart={onPointerDown}
       className={`fixed z-200 flex items-center justify-center select-none ${cursorClass}`}
-      style={handleStyle}
+      style={getHandleStyle()}
     >
-      <div className={`fixed pointer-events-none ${lineClass}`} style={lineStyle} />
       <div className={`flex h-8 w-4 flex-col items-center justify-center gap-0.75 rounded-full border backdrop-blur-sm ${pipClass}`}>
         <div className={`h-px w-2 ${dotClass}`} />
         <div className={`h-px w-2 ${dotClass}`} />
@@ -470,7 +523,7 @@ export default function SplitViewport() {
         )}
         {exploreMode && (
           <>
-            {(splitMode === "vertical" || splitMode === "horizontal" || splitMode === "angled") && (
+            {(splitMode !== "mouse" && splitMode !== "overlaped") && (
               <SplitHandle
                 dominantTheme={dominantTheme}
               />
