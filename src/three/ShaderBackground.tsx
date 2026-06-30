@@ -141,15 +141,40 @@ type Props = {
 
 const textureLoader = new THREE.TextureLoader();
 
-/** Module-level cache: each URL is fetched and uploaded to the GPU only once. */
+/** LRU texture cache: disposes the oldest texture when the limit is exceeded. */
+const MAX_TEXTURE_CACHE = 20;
 const textureCache = new Map<string, THREE.Texture>();
+const textureLRUOrder: string[] = [];
+
+function getCachedTexture(url: string): THREE.Texture | undefined {
+  const tex = textureCache.get(url);
+  if (tex) {
+    const idx = textureLRUOrder.indexOf(url);
+    if (idx !== -1) textureLRUOrder.splice(idx, 1);
+    textureLRUOrder.push(url);
+  }
+  return tex;
+}
+
+function setCachedTexture(url: string, tex: THREE.Texture) {
+  if (textureCache.has(url)) return;
+  if (textureCache.size >= MAX_TEXTURE_CACHE) {
+    const oldest = textureLRUOrder.shift();
+    if (oldest) {
+      textureCache.get(oldest)?.dispose();
+      textureCache.delete(oldest);
+    }
+  }
+  textureCache.set(url, tex);
+  textureLRUOrder.push(url);
+}
 
 export function preloadTextures(urls: string[]) {
   urls.forEach((url) => {
     if (!url || textureCache.has(url)) return;
     textureLoader.loadAsync(url).then((tex) => {
       tex.needsUpdate = true;
-      textureCache.set(url, tex);
+      setCachedTexture(url, tex);
     });
   });
 }
@@ -179,13 +204,13 @@ function ShaderPlane({
 	useEffect(() => {
 		if (!mesh.current) return;
 		if (image) {
-			const cached = textureCache.get(image);
+			const cached = getCachedTexture(image);
 			if (cached) {
 				mesh.current.material.uniforms.uTexture.value = cached;
 			} else {
 				textureLoader.loadAsync(image).then((texture) => {
 					texture.needsUpdate = true;
-					textureCache.set(image, texture);
+					setCachedTexture(image, texture);
 					if (!mesh.current) return;
 					mesh.current.material.uniforms.uTexture.value = texture;
 				});

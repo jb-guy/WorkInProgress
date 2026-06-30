@@ -92,7 +92,7 @@ export default function Carousel({
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { focusedItemId, setFocusedItemId, setActiveItemId} = useSectionInteraction("work");
+  const { focusedItemId, activeItemId, setFocusedItemId, setActiveItemId} = useSectionInteraction("work");
 
   useEffect(() => {
     if (pauseOnHover && containerRef.current) {
@@ -126,46 +126,29 @@ export default function Carousel({
   }, [items.length, loop, trackItemOffset, x]);
 
   useEffect(() => {
-    if (!loop && position > itemsForRender.length - 1) {
-      setPosition(Math.max(0, itemsForRender.length - 1));
-    }
-    if (itemsForRender.length === 0 && !isAnimating) {
-      setActiveItemId(null);
-    } else {
-      const activeIndex = loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
-      
-    }
-  }, [itemsForRender.length, loop, position, isAnimating]);
-
-  useEffect(() => {
-    const activeIndex = loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
-    if (focusedItemId === null || items[activeIndex]?.id === focusedItemId) return;
-    const newIndex = items.findIndex(item => item.id === focusedItemId);
-    if (newIndex === -1) return;
-    setPosition(newIndex + (loop ? 1 : 0));
-  }, [focusedItemId]);
+    if (isAnimating || activeItemId === null) return;
+    const activeIndex = items.findIndex(item => item.id === activeItemId);
+    setPosition(activeIndex + (loop ? 1 : 0));
+  }, [activeItemId]);
 
   const effectiveTransition = isJumping ? { duration: 0 } : SPRING_OPTIONS;
 
   const handleAnimationStart = () => {
     if(isAnimating) return;
     setIsAnimating(true);
-    setActiveItemId(null);
-    setTimeout(() => {
-      const activeIndex = loop ? (position - 1 + items.length) % items.length : Math.min(position, items.length - 1);
-      setActiveItemId(items[activeIndex]?.id ?? null);
-      setFocusedItemId(items[activeIndex]?.id ?? null);
-    }, 300);
+    const activeIndex = loop ? (position - 1 + items.length) % items.length : position;
+    setActiveItemId(items[activeIndex]?.id ?? null);
   };
 
   const handleAnimationComplete = () => {
+    if (!isAnimating) return;
     if (!loop || itemsForRender.length <= 1) {
       setIsAnimating(false);
+      setFocusedItemId(items[position]?.id ?? null);
       return;
     }
-    const lastCloneIndex = itemsForRender.length - 1;
 
-    if (position === lastCloneIndex) {
+    if (position === itemsForRender.length - 1) {
       setIsJumping(true);
       const target = 1;
       setPosition(target);
@@ -173,6 +156,7 @@ export default function Carousel({
       requestAnimationFrame(() => {
         setIsJumping(false);
         setIsAnimating(false);
+        setFocusedItemId(items[0]?.id ?? null);
       });
       return;
     }
@@ -185,11 +169,13 @@ export default function Carousel({
       requestAnimationFrame(() => {
         setIsJumping(false);
         setIsAnimating(false);
+        setFocusedItemId(items[items.length - 1]?.id ?? null);
       });
       return;
     }
 
     setIsAnimating(false);
+    setFocusedItemId(items[position-1]?.id ?? null);
   };
 
   const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo): void => {

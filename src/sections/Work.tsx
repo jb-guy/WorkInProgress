@@ -1,6 +1,5 @@
 import type { Theme } from "../context/ThemeContext";
 import { useSectionInteraction } from "../context/SectionInteractionContext";
-import SphereMenu from "../three/SphereMenu";
 import { preloadTextures } from "../three/ShaderBackground"
 import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll } from "motion/react";
@@ -69,7 +68,7 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
   // focusedItemId = press/hover preview; activeItemId = confirmed after drag release.
   const displayImage = useMemo(() => {
     return items.find(item => item.id === (activeItemId ?? focusedItemId))?.background;
-  }, [focusedItemId, activeItemId]);
+  }, [activeItemId, focusedItemId]);
 
   useEffect(() => {
     if (!right ) {
@@ -78,9 +77,9 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
   }, [isInView]);
 
   const progress = useMemo(() => {
-    if (activeItemId && details === "inView") return window.innerWidth > 768 ? 0.75 : 1.0; 
-    return 0.1;
-  }, [focusedItemId, activeItemId, details]);
+    if (activeItemId==focusedItemId && details === "inView") return window.innerWidth > 768 ? 0.75 : 1.0; 
+    return 0.2;
+  }, [activeItemId, focusedItemId, details]);
 
   return (
     <div className="work-theme theme-bg relative h-[120vh] lg:h-screen w-full flex justify-center items-center overflow-visible">
@@ -102,19 +101,12 @@ const WorkOuterContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
 const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) => {
   const { focusedItemId, setFocusedItemId, activeItemId, setActiveItemId } = useSectionInteraction(WORK_SECTION_ID);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [showHint, setShowHint] = useState<boolean>(true);
 
   const queueSceneUpdate = useQueuedSceneUpdate();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["60% end", "80% end"],
   });
-
-  useEffect(() => {
-    if (activeItemId) {
-      setShowHint(false);
-    }
-  }, [activeItemId]);
 
   // Preload all project backgrounds on mount so the shader never stalls on a cache miss.
   useEffect(() => {
@@ -135,11 +127,7 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
       transition: (1-latest),
     });
   });
-
-  const closeItem = () => {
-    setFocusedItemId(null);
-    setActiveItemId(null);
-  };
+  //console.log(activeItemId, focusedItemId);
 
   return (
     <div ref={sectionRef} className="relative work-theme flex h-[120vh] lg:h-screen w-full flex-col items-start pt-18 pointer-events-auto">
@@ -158,7 +146,7 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
             </div>
           </div>
       <AnimatePresence>
-          {activeItemId &&
+          {focusedItemId == activeItemId &&
           (<>
             <motion.div key="modal" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{opacity:0, x: -100}} className="z-200 lg:order-first theme-card relative lg:w-1/4 pointer-events-auto flex flex-col">
               <h3 className="text-3xl lg:pt-6">{items[Number(activeItemId)]?.title}</h3>
@@ -172,7 +160,7 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
             <motion.div key="stack" initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }} className="z-200 hidden lg:block theme-card w-1/4 pointer-events-auto text-right">
               <h3 className="text-3xl lg:pt-6">Stack used</h3>
               <div className="mt-8 flex flex-col gap-2">
-                {items[Number(activeItemId)]?.front && (
+                {items[Number(focusedItemId)]?.front && (
                   <div>
                     <p className="theme-sub text-sm">Front-end</p>
                     <ul className="mt-2 flex gap-x-2 flex-wrap justify-end">
@@ -182,11 +170,11 @@ const WorkInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }) =
                     </ul>
                   </div>
                 )}
-                {items[Number(activeItemId)]?.back && (
+                {items[Number(focusedItemId)]?.back && (
                   <div className="mt-4">
                     <p className="theme-sub text-sm">Back-end</p>
                     <ul className="mt-2 flex gap-x-2 flex-wrap justify-end">
-                      {items[Number(activeItemId)]?.back?.map((tech, index) => (
+                      {items[Number(focusedItemId)]?.back?.map((tech, index) => (
                           <li key={index} className="text-sm">{index !== 0 && <span>•</span>} {tech}</li>
                       ))}
                     </ul>

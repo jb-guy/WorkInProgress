@@ -56,7 +56,6 @@ precision highp float;
 
 uniform float uTime;
 uniform vec3 uColor;
-uniform vec2 uResolution;
 uniform vec2 uMouse;
 uniform float uAmplitude;
 uniform float uSpeed;
@@ -91,7 +90,7 @@ interface HolographicBackgroundProps {
   amplitude?: number;
   mouseReact?: boolean;
   mousePos?: React.RefObject<{ x: number; y: number }>;
-  resolution?:{ x: number; y: number };
+  resolution?:React.RefObject<{ x: number; y: number }>;
 }
 
 
@@ -102,7 +101,6 @@ const HolographicBackground = ({
   speed = 1.0,
   amplitude = 0.1,
   mousePos,
-  resolution = undefined,
   ...rest
 }: HolographicBackgroundProps) => {
   
@@ -112,24 +110,18 @@ const HolographicBackground = ({
   const planeUniforms = useMemo(() => ({
     uTime: { value: 0 },
     uColor: { value: [1,1,1] },
-    uResolution: {
-      value: new Float32Array([resolution?.x ?? 100, resolution?.y ?? 100])
-    },
     uMouse: { value: new Float32Array([0.5, 0.5]) },
     uAmplitude: { value: amplitude },
     uSpeed: { value: speed }
-  }), [resolution, color, amplitude, speed]);
+  }), [color, amplitude, speed]);
 
   const sphereUniforms = useMemo(() => ({
     uTime: { value: 0 },
     uColor: { value: color },
-    uResolution: {
-      value: new Float32Array([resolution?.x ?? 100, resolution?.y ?? 100])
-    },
     uMouse: { value: new Float32Array([mousePos?.current?.x ?? 0.5, mousePos?.current?.y ?? 0.5]) },
     uAmplitude: { value: amplitude*2 },
     uSpeed: { value: speed }
-  }), [resolution, color, amplitude, speed]);
+  }), [color, amplitude, speed]);
     
   useFrame(state => {
     if(!mesh.current || !mesh.current!.material.uniforms) return;

@@ -5,6 +5,7 @@ import { useQueuedSceneUpdate } from "../hooks/useQueuedSceneUpdate";
 
 const ContactOuterContent = ({ theme }: { theme: Theme }) => {
   const outerRef = useRef<HTMLDivElement>(null);
+  const lastDominantThemeRef = useRef<string>("left");
   const { setDominantTheme, setDominantThemeOverride, exploreMode } = useTheme();
 
   const { scrollYProgress } = useScroll({
@@ -14,8 +15,15 @@ const ContactOuterContent = ({ theme }: { theme: Theme }) => {
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
 
-    if (latest > 0.5 && !exploreMode) {setDominantTheme("deepspace"); setDominantThemeOverride(true);}
-    if (latest <= 0.5 && !exploreMode) {setDominantTheme("dreamscape"); setDominantThemeOverride(false);}
+    if (lastDominantThemeRef.current === "left" && latest > 0.5 && !exploreMode) {
+      setDominantTheme("deepspace"); 
+      setDominantThemeOverride(true);
+      lastDominantThemeRef.current = "right";
+    } else if (lastDominantThemeRef.current === "right" && latest <= 0.5 && !exploreMode) {
+      setDominantTheme("dreamscape");
+      setDominantThemeOverride(false);
+      lastDominantThemeRef.current = "left";
+    }
   });
   
   return (

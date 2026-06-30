@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { isDarkTheme, type Theme } from "../context/ThemeContext";
 import type { SectionId } from "../sections/Nav";
@@ -45,6 +45,11 @@ export const SectionMenu = ({
 
   const {hoveredItemId, setHoveredItemId} = useSectionInteraction("nav");
 
+  // Stable ref so the keydown handler never needs to be re-registered when
+  // hoveredItemId changes (avoids remove/add on every arrow key press).
+  const hoveredItemIdRef = useRef<number>(hoveredItemId as number ?? 0);
+  hoveredItemIdRef.current = hoveredItemId as number ?? 0;
+
   // Handle keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
@@ -53,16 +58,16 @@ export const SectionMenu = ({
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setHoveredItemId( Math.min((hoveredItemId as number) + 1, SECTIONS.length - 1) );
+          setHoveredItemId(Math.min(hoveredItemIdRef.current + 1, SECTIONS.length - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
-          setHoveredItemId(Math.max((hoveredItemId as number) - 1, 0));
+          setHoveredItemId(Math.max(hoveredItemIdRef.current - 1, 0));
           break;
         case "Enter":
         case " ":
           e.preventDefault();
-          handleSectionClick(SECTIONS[hoveredItemId as number].id);
+          handleSectionClick(SECTIONS[hoveredItemIdRef.current].id);
           break;
         case "Escape":
           e.preventDefault();
@@ -73,7 +78,7 @@ export const SectionMenu = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, hoveredItemId, onClose]);
+  }, [isOpen, onClose]);
 
   // Update highlighted index when activeSection changes (via scroll)
   useEffect(() => {

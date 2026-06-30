@@ -64,7 +64,6 @@ export const useQueuedSceneUpdate = () => {
       if (!shouldUpdate) return;
       
       flushSync(() => {
-        console.log("Updating scene with:", next);
         if (next.themeRight && next.themeRight !== lastTransitionDetails.current?.themeRight) {
           setThemeRight(next.themeRight);
         }
@@ -74,28 +73,29 @@ export const useQueuedSceneUpdate = () => {
         if (next.splitMode && next.splitMode !== lastTransitionDetails.current?.splitMode) {
           setSplitMode(next.splitMode);
         }
-        if (next.splitAngleDeg !== undefined && next.splitAngleDeg !== lastTransitionDetails.current?.splitAngleDeg) {
-          setSplitAngleDeg(next.splitAngleDeg);
-        }
-        if (next.themeRightOpacity !== undefined && next.themeRightOpacity !== lastTransitionDetails.current?.themeRightOpacity) {
-          setThemeRightOpacity(next.themeRightOpacity);
-        }
         if (dominantTheme && dominantTheme !== lastDominantThemeRef.current) {
           setDominantTheme(dominantTheme);
           lastDominantThemeRef.current = dominantTheme;
         }
       });
+      if (next.splitAngleDeg !== undefined && next.splitAngleDeg !== lastTransitionDetails.current?.splitAngleDeg) {
+        setSplitAngleDeg(next.splitAngleDeg);
+      }
+      if (next.themeRightOpacity !== undefined && next.themeRightOpacity !== lastTransitionDetails.current?.themeRightOpacity) {
+        setThemeRightOpacity(next.themeRightOpacity);
+      }
       lastTransitionDetails.current = { ...lastTransitionDetails.current, ...next };
     });
   }, [devMode, exploreMode, dominantThemeOverride, setSplitAngleDeg, setSplitMode, setThemeRight, setThemeLeft, setThemeRightOpacity, setTransition]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     return () => {
       if (rafRef.current !== null) {
         window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
       }
     };
-  }, []);*/
+  }, []);
 
   return queueSceneUpdate;
 };

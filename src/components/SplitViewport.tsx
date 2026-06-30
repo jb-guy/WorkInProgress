@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from "react";
 import { isDarkTheme, useSplitTransition, useTheme, type SplitMode, type Theme } from "../context/ThemeContext";
 import { NavBar, NavDevControls, NavExploreControls, NavStatusBadge, NavWindow, type SectionId } from "../sections/Nav";
 import Hero from "../sections/Hero";
@@ -272,6 +272,10 @@ export default function SplitViewport() {
     };
   }, [updateRootClips]);
 
+  useLayoutEffect(() => {
+    updateRootClips();
+  }, [splitMode, splitAngleDeg, transitionRef.current, themeRightOpacity, updateRootClips]);
+
   useEffect(() => {
     const onResize = () => {
       setViewportWidth(window.innerWidth);
@@ -282,33 +286,45 @@ export default function SplitViewport() {
   }, []);
 
   useEffect(() => {
+    if (splitMode !== "mouse") return;
+    let rafId: number | null = null;
+    let latestX = 0;
+    let latestY = 0;
     const onMouseMove = (e: MouseEvent) => {
-      document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
-      document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
-    }
-    if (splitMode === "mouse") {
-      document.addEventListener("mousemove", onMouseMove);
-    }
+      latestX = e.clientX;
+      latestY = e.clientY;
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        document.documentElement.style.setProperty("--mouse-x", `${latestX}px`);
+        document.documentElement.style.setProperty("--mouse-y", `${latestY}px`);
+      });
+    };
+    document.addEventListener("mousemove", onMouseMove);
     return () => {
       document.removeEventListener("mousemove", onMouseMove);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, [splitMode]);
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    SECTIONS.forEach((section, index) => {
-      const el = outerRefs.current[index];
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = (entry.target as HTMLElement).dataset.sectionId as SectionId | undefined;
+            if (id) setActiveSection(id);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    outerRefs.current.forEach((el, index) => {
       if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveSection(section.id);
-        },
-        { threshold: 0.5 }
-      );
+      el.dataset.sectionId = SECTIONS[index].id;
       obs.observe(el);
-      observers.push(obs);
     });
-    return () => observers.forEach((observer) => observer.disconnect());
+    return () => obs.disconnect();
   }, []);
 
   const onPointerMove = useCallback((e: PointerEvent) => {
@@ -366,7 +382,7 @@ export default function SplitViewport() {
   const spacerElement = useMemo(() => (
     <div className="relative -z-1000">
       {SECTIONS.map((section, index) => (
-        <div key={section.id} ref={(element) => { outerRefs.current[index] = element; }} className="h-screen" />
+        <div key={section.id} ref={(element) => { outerRefs.current[index] = element; }} data-section-id={section.id} className="h-screen" />
       ))}
       {/* Add extra spacer at the end for phone */}
       <div className="h-[120vh] lg:h-0" />

@@ -17,6 +17,16 @@
   animation: cinematic-flicker var(--flicker-speed, 0.3s) steps(2, jump-none) infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-noise-canvas {
+    animation: none;
+  }
+  .cinematic-artifact-band {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 .cinematic-scanlines {
   position: absolute;
   inset: 0;

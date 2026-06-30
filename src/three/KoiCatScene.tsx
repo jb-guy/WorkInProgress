@@ -59,13 +59,21 @@ const useKoiCatModel = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    let createdMixer: THREE.AnimationMixer | null = null;
+    let clonedSceneRef: THREE.Group | null = null;
+
     loadGLTFData()
       .then((gltf) => {
+        if (cancelled) return;
+
         // Clone the scene for THIS instance (avoids reparenting conflicts)
         const clonedScene = gltf.scene.clone(true);
-        
+        clonedSceneRef = clonedScene;
+
         // Create mixer for THIS instance
         const mixer = new THREE.AnimationMixer(clonedScene);
+        createdMixer = mixer;
 
         // Find objects in cloned scene
         const objects = {
@@ -99,9 +107,31 @@ const useKoiCatModel = () => {
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Failed to load KoiCat model:", error);
-        setIsLoading(false);
+        if (!cancelled) {
+          console.error("Failed to load KoiCat model:", error);
+          setIsLoading(false);
+        }
       });
+
+    return () => {
+      cancelled = true;
+      if (createdMixer && clonedSceneRef) {
+        createdMixer.stopAllAction();
+        createdMixer.uncacheRoot(clonedSceneRef);
+      }
+      if (clonedSceneRef) {
+        clonedSceneRef.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry?.dispose();
+            if (Array.isArray(child.material)) {
+              child.material.forEach((m) => m.dispose());
+            } else {
+              child.material?.dispose();
+            }
+          }
+        });
+      }
+    };
   }, []);
 
   return { model, isLoading };

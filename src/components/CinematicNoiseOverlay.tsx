@@ -279,8 +279,20 @@ export default function CinematicNoiseOverlay({
     rafId = window.requestAnimationFrame(render);
     window.addEventListener("resize", resizeCanvas);
 
+    // Pause the render loop when the document is hidden (tab in background)
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      } else if (rafId === 0) {
+        rafId = window.requestAnimationFrame(render);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     return () => {
       window.removeEventListener("resize", resizeCanvas);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       window.cancelAnimationFrame(rafId);
       gl.deleteBuffer(buf);
       gl.deleteProgram(program);
