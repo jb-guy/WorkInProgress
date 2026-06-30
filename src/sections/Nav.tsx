@@ -123,6 +123,7 @@ export const NavExploreControls = ({ dominantTheme, isMenuOpen, onMenuToggle }: 
     splitAngleDeg,
     themeRightOpacity,
     setSplitMode,
+    setTransition,
     setSplitAngleDeg,
     setThemeRightOpacity,
   } = useSplitTransition();
@@ -138,7 +139,7 @@ export const NavExploreControls = ({ dominantTheme, isMenuOpen, onMenuToggle }: 
         <div className="flex flex-col h-full lg:flex-row lg:items-center justify-center gap-2">
           <div className="flex items-center gap-1 px-2 text-[0.65rem] font-mono">
             <p className="ml-4 text-sub text-xs opacity-60">Theme:</p>
-            {THEMES.slice(1).map((theme, index) => (
+            {THEMES.slice(1,-1).map((theme, index) => (
               <button
                 key={index}
                 data-theme={theme}
@@ -171,14 +172,6 @@ export const NavExploreControls = ({ dominantTheme, isMenuOpen, onMenuToggle }: 
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M318.4 138.1C324 121.3 314.9 103.2 298.2 97.6C281.5 92 263.3 101.1 257.7 117.8L129.7 501.8C124.1 518.6 133.2 536.7 149.9 542.3C166.6 547.9 184.8 538.8 190.4 522.1L318.4 138.1zM389.3 96.4C371.9 93.5 355.4 105.3 352.5 122.7L288.5 506.7C285.6 524.1 297.4 540.6 314.8 543.5C332.2 546.4 348.7 534.6 351.6 517.2L415.6 133.2C418.5 115.8 406.7 99.3 389.3 96.4zM480 96C462.3 96 448 110.3 448 128L448 512C448 529.7 462.3 544 480 544C497.7 544 512 529.7 512 512L512 128C512 110.3 497.7 96 480 96z"/></svg>
           </button>
-          {/* overlaped button icon */}
-          <button
-            className={`h-6 w-6 flex items-center justify-center ${splitMode === "overlaped" ? "border-2 border-current" : ""}`}
-            onClick={() => {setSplitMode("overlaped");setThemeRightOpacity?.(0.5);}}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M296.5 69.2C311.4 62.3 328.6 62.3 343.5 69.2L562.1 170.2C570.6 174.1 576 182.6 576 192C576 201.4 570.6 209.9 562.1 213.8L343.5 314.8C328.6 321.7 311.4 321.7 296.5 314.8L77.9 213.8C69.4 209.8 64 201.3 64 192C64 182.7 69.4 174.1 77.9 170.2L296.5 69.2zM112.1 282.4L276.4 358.3C304.1 371.1 336 371.1 363.7 358.3L528 282.4L562.1 298.2C570.6 302.1 576 310.6 576 320C576 329.4 570.6 337.9 562.1 341.8L343.5 442.8C328.6 449.7 311.4 449.7 296.5 442.8L77.9 341.8C69.4 337.8 64 329.3 64 320C64 310.7 69.4 302.1 77.9 298.2L112 282.4zM77.9 426.2L112 410.4L276.3 486.3C304 499.1 335.9 499.1 363.6 486.3L527.9 410.4L562 426.2C570.5 430.1 575.9 438.6 575.9 448C575.9 457.4 570.5 465.9 562 469.8L343.4 570.8C328.5 577.7 311.3 577.7 296.4 570.8L77.9 469.8C69.4 465.8 64 457.3 64 448C64 438.7 69.4 430.1 77.9 426.2z"/></svg>
-
-          </button>
           {/* circle button icon */}
           <button
             className={`h-6 w-6 flex items-center justify-center ${splitMode === "circle" ? "border-2 border-current" : ""}`}
@@ -197,7 +190,7 @@ export const NavExploreControls = ({ dominantTheme, isMenuOpen, onMenuToggle }: 
           {window.innerWidth >= 768 && (
             <button
               className={`h-6 w-6 flex items-center justify-center ${splitMode === "mouse" ? "border-2 border-current" : ""}`}
-              onClick={() => setSplitMode("mouse")}
+              onClick={() => {setSplitMode("mouse"); setTransition(0.4);}}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M173.3 66.5C181.4 62.4 191.2 63.3 198.4 68.8L518.4 308.7C526.7 314.9 530 325.7 526.8 335.5C523.6 345.3 514.4 351.9 504 351.9L351.7 351.9L440.6 529.6C448.5 545.4 442.1 564.6 426.3 572.5C410.5 580.4 391.3 574 383.4 558.2L294.5 380.5L203.2 502.3C197 510.6 186.2 513.9 176.4 510.7C166.6 507.5 160 498.3 160 488L160 88C160 78.9 165.1 70.6 173.3 66.5z"/></svg>
             </button>
