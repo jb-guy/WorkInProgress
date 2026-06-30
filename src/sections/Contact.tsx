@@ -60,7 +60,7 @@ const ContactInnerContent = ({ theme, right }: { theme: Theme; right?: boolean }
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (!right) return;
+    if (!right || latest > 0.5) return;
     queueSceneUpdate({
       themeLeft: "dreamscape",
       themeRight: "wireframe",

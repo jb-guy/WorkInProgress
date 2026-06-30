@@ -93,7 +93,6 @@ function SplitHandle({
   const splitAngle = splitMode === "angled" ? splitAngleDeg : splitMode === "horizontal" ? 90 : 0;
 
   const getHandleStyle = useCallback(() => {
-    console.log("weird", splitMode)
     if(splitMode === "vertical"){
       const effectiveSplitX = Math.max(
         20,
@@ -130,7 +129,6 @@ function SplitHandle({
       const centerY = (typeof window !== "undefined" ? window.innerHeight : 760) / 2;
       const diagonale = Math.sqrt((centerX*2) ** 2 + (centerY*2) ** 2);
       const radius = (transitionRef.current * diagonale) / 2;
-      console.log(window.innerWidth, centerX, radius, transitionRef.current, diagonale);
       return {
         top: `50%`,
         left: `${centerX + radius}px`,
@@ -162,6 +160,7 @@ function SplitHandle({
     e.preventDefault();
 
     const onPointerMove = (moveEvent: PointerEvent|TouchEvent) => {
+      e.preventDefault();
       if(splitMode === "horizontal") {
         const newTransition = 1 - (moveEvent instanceof TouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY) / (typeof window !== "undefined" ? window.innerHeight : 760);
         setTransition(Math.max(0, Math.min(1, newTransition)));
@@ -201,7 +200,7 @@ function SplitHandle({
 
     document.addEventListener("pointermove", onPointerMove);
     document.addEventListener("pointerup", onPointerUp);
-    document.addEventListener("touchmove", onPointerMove);
+    document.addEventListener("touchmove", onPointerMove, { passive: false });
     document.addEventListener("touchend", onPointerUp);
   };
 
@@ -228,7 +227,7 @@ function SplitHandle({
       ref={lineRef}
       onPointerDown={onPointerDown}
       onTouchStart={onPointerDown}
-      className={`fixed z-200 flex items-center justify-center select-none ${cursorClass}`}
+      className={`fixed z-200 flex items-center justify-center select-none ${cursorClass} touch-none`}
       style={getHandleStyle()}
     >
       <div className={`flex h-8 w-4 flex-col items-center justify-center gap-0.75 rounded-full border backdrop-blur-sm ${pipClass}`}>

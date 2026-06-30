@@ -40,11 +40,11 @@ const HeroInnerContent = ({ right, theme }: { right?: boolean; theme: Theme }) =
     if(right) return;
     queueSceneUpdate({ splitMode: "circle", themeRight: "holographic" });
     animate(0,1, {
-      delay: 2,
-      duration: 0.5,
+      delay: 1,
+      duration: 0.7,
       ease: "circIn",
       onUpdate(value) {
-        queueSceneUpdate({ transition: value });
+        queueSceneUpdate({ transition: value, themeRight: "holographic" });
       },
       onComplete() {
         queueSceneUpdate({themeLeft: "holographic" });
